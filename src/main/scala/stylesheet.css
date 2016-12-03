@@ -1,30 +1,28 @@
-#location {
+.text-field {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
     -fx-font-family: monospace;
 }
 
-#list .label {
+.label {
     -fx-text-fill: #DDDDDD;
     -fx-font-family: monospace;
 }
 
-#list .list-cell {
+.list-cell {
     -fx-background-color: black;
     -fx-text-fill: white;
     -fx-font-family: monospace;
 }
 
-#list .list-cell:filled:selected,
-#list .list-cell:filled:selected:focused {
-    //-fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
+.list-cell:filled:selected {
+    /* -fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%); */
     -fx-background-color: purple;
 }
 
-#list .list-cell:even {
+.list-cell:even {
     -fx-background-color: black;
 }
 
-#list .list-cell:filled:hover {
-    -fx-underline: true;
+.list-cell:filled:hover {
 }

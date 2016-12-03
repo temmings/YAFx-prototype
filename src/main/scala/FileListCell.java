@@ -30,8 +30,8 @@ public class FileListCell extends ListCell<File> {
             return;
         }
         name.setText(file.getName());
-        size.setText(LocalFileSystem.getFileSizeString(file));
-        modTime.setText(LocalFileSystem.formatDateTime(file.lastModified()));
+        size.setText(Utils.getFileSizeString(file));
+        modTime.setText(Utils.formatDateTime(file.lastModified()));
         setGraphic(container);
     }
 }

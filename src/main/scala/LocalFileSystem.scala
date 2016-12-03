@@ -1,31 +1,21 @@
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
 
 object LocalFileSystem {
-  def getList(path: String): List[File] = {
-    val f = new File(path)
-
+  def getList(f: File): List[File] = {
     if (!f.exists || !f.isDirectory)
       List[File]()
 
-    f.listFiles
+    f.listFiles()
       .sortBy(sortCondition)
       .toList
   }
+  def getList(path: String): List[File] = getList(new File(path))
 
   def sortCondition(f: File) = (!f.isDirectory, f.getName)
-
-  def formatDateTime(time: Long) = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(new Date(time))
-
-  def getFileSizeString(file: File) = {
-    if (file.isDirectory)
-      "<DIR>"
-    else
-      file.length.toString
-  }
 
   def isExist(path: String) = new File(path).exists
   def isFile(path: String) = new File(path).isFile
   def isDirectory(path: String) = new File(path).isDirectory
+  def canChangeDirectory(file: File): Boolean = file.isDirectory && file.canRead
+  def canChangeDirectory(path: String): Boolean = canChangeDirectory(new File(path))
 }

@@ -1,4 +1,5 @@
 import java.io.File
+import scala.sys.process.Process
 
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
@@ -13,66 +14,102 @@ class FileListController(val panel: AnchorPane,
                           val list: ListView[File]) {
 
   val fs = LocalFileSystem
+  val editor = "C:/Users/temmings/Dropbox/Windows/vim74-kaoriya-win64/gvim.exe --remote-tab-silent"
   val defaultLocation = "C:/Users/temmings"
+  var currentLocation = ""
 
   def initialize = {
+    location.setMouseTransparent(true)
     list.setMouseTransparent(true)
-    list.setFocusTraversable(false)
-    Platform.runLater(list.requestFocus)
     list.cellFactory = (_: ListView[File]) => new ListCell[File](new FileListCell())
-    location.text.onChange {
-      refreshFileList
-    }
+    Platform.runLater(list.requestFocus)
+    location.text.onChange { changeLocationHandler }
     setLocation(defaultLocation)
   }
-  def getLocation = location.getText
-  def setLocation(path: String) = location.setText(path)
+
+  def changeLocationHandler = {
+    val path = location.getText
+    if (fs.canChangeDirectory(path)) {
+      setLocation(path)
+    }
+  }
+
+  def editFile(file: File) = Process(s"${editor} ${file.getAbsolutePath}").run
+
+  def setLocation(path: String) = {
+    currentLocation = path
+    location.setText(path)
+    refreshFileList
+    list.getSelectionModel.select(0)
+  }
+  def undoLocation = location.setText(currentLocation)
+
   def getCurrentItem = list.getSelectionModel.getSelectedItem
+  def refreshFileList = list.items = ObservableBuffer(fs.getList(currentLocation))
 
-  def refreshFileList = {
-    if (fs.isDirectory(getLocation)) {
-      list.items = ObservableBuffer(fs.getList(getLocation))
-    }
+  def focusToLocation = {
+    println(s"focus to ${location}")
+    location.requestFocus
+  }
+  def focusToList = {
+    println(s"focus to ${list}")
+    list.requestFocus
   }
 
-  def onPanelKeyPressed(e: KeyEvent) = {
-    println(s"press ${e.code} on Panel")
+  def onLocationKeyReleased(e: KeyEvent) = {
+    println(s"${e.code} on ${e.target} from ${e.source}")
     e.code match {
-      case _ =>
-    }
-  }
-
-  def onLocationKeyPressed(e: KeyEvent) = {
-    println(s"press ${e.code} on Location")
-    e.code match {
+      case KeyCode.Escape => {
+        e.consume
+        undoLocation
+        focusToList
+      }
       case _ =>
     }
   }
 
   def onListKeyPressed(e: KeyEvent) = {
-    println(s"press ${e.code} on List")
+    println(s"${e.code} on ${e.target} from ${e.source}")
     e.code match {
       case KeyCode.Enter => {
-        if (getCurrentItem.isDirectory)
-          setLocation(getCurrentItem.getCanonicalPath)
+        e.consume
+        val item = getCurrentItem
+        if (item.isDirectory && item.canRead) {
+          println(s"into directory: ${item.getCanonicalPath}")
+          setLocation(item.getCanonicalPath)
+        }
       }
       case KeyCode.BackSpace => {
-        val current = new File(getLocation)
+        e.consume
+        val current = new File(currentLocation)
         if (null != current) {
           if (null != current.getParent) {
+            println(s"upto directory: ${current.getParent}")
             setLocation(current.getParent)
           }
         }
       }
+      case KeyCode.Comma => e.consume
+      case KeyCode.E => {
+        e.consume
+        val file = getCurrentItem
+        if (!file.isDirectory) editFile(file)
+      }
       case KeyCode.Q => {
+        e.consume
+        println(s"close ${FilerApp.stage}")
         FilerApp.stage.close()
-        println("close stage")
       }
-      case _ => {
-        // FIXME: delegate KeyEvent to Panel
-        println(s"delegate KeyEvent to Panel: ${e.code}")
-        onPanelKeyPressed(e)
+      case _ =>
+    }
+  }
+  def onListKeyReleased(e: KeyEvent) = {
+    e.code match {
+      case KeyCode.Comma => {
+        e.consume()
+        focusToLocation
       }
+      case _ =>
     }
   }
 
