@@ -1,8 +1,9 @@
 import java.io.File
 
+import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control._
-import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.input.{KeyCode, KeyEvent, ScrollEvent}
 import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 
@@ -15,6 +16,9 @@ class FileListController(val panel: AnchorPane,
   val defaultLocation = "C:/Users/temmings"
 
   def initialize = {
+    list.setMouseTransparent(true)
+    list.setFocusTraversable(false)
+    Platform.runLater(list.requestFocus)
     list.cellFactory = (_: ListView[File]) => new ListCell[File](new FileListCell())
     location.text.onChange {
       refreshFileList
