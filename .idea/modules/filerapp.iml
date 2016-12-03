@@ -29,5 +29,6 @@
     <orderEntry type="library" scope="TEST" name="SBT: org.scala-lang.modules:scala-xml_2.11:1.0.2:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang.modules:scala-java8-compat_2.11:0.5.0:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-reflect:2.11.4:jar" level="project" />
+    <orderEntry type="library" name="SBT: com.sun.jna:jna:3.0.9:jar" level="project" />
   </component>
 </module>

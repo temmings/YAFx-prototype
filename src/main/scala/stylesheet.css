@@ -4,6 +4,18 @@
     -fx-font-family: monospace;
 }
 
+.text-area {
+    -fx-background-color: black;
+    -fx-text-fill: #DDDDDD;
+    -fx-font-family: monospace;
+}
+
+.content {
+    -fx-background-color: black;
+    -fx-text-fill: #DDDDDD;
+    -fx-font-family: monospace;
+}
+
 .label {
     -fx-text-fill: #DDDDDD;
     -fx-font-family: monospace;

@@ -1,6 +1,8 @@
 import java.io.File
-import scala.sys.process.Process
 
+import scala.io.Source
+import scala.sys.process.Process
+import scala.util.Properties
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control._
@@ -9,13 +11,13 @@ import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 
 @sfxml
-class FileListController(val panel: AnchorPane,
+class FileListController(
+                          val panel: AnchorPane,
                           val location: TextField,
-                          val list: ListView[File]) {
+                          val list: ListView[File],
+                          val viewer: TextArea) {
 
   val fs = LocalFileSystem
-  val editor = "C:/Users/temmings/Dropbox/Windows/vim74-kaoriya-win64/gvim.exe --remote-tab-silent"
-  val defaultLocation = "C:/Users/temmings"
   var currentLocation = ""
 
   def initialize = {
@@ -24,7 +26,7 @@ class FileListController(val panel: AnchorPane,
     list.cellFactory = (_: ListView[File]) => new ListCell[File](new FileListCell())
     Platform.runLater(list.requestFocus)
     location.text.onChange { changeLocationHandler }
-    setLocation(defaultLocation)
+    setLocation(Configuration.defaultLocation)
   }
 
   def changeLocationHandler = {
@@ -34,7 +36,24 @@ class FileListController(val panel: AnchorPane,
     }
   }
 
-  def editFile(file: File) = Process(s"${editor} ${file.getAbsolutePath}").run
+  def editFile(file: File) = Process(s"${Configuration.editor} ${file.getAbsolutePath}").run
+
+  def viewFile(file: File) = {
+    val source = Source.fromFile(file, Configuration.ViewerDefaultCharset, Configuration.ViewerBufferSize)
+    val lines = source.getLines
+    val sb = new StringBuilder
+    lines.foreach(l => sb.append(l + Properties.lineSeparator))
+    source.close
+    viewer.setText(sb.toString)
+    viewer.setScrollTop(Double.MinValue)
+    viewer.setVisible(true)
+    viewer.requestFocus
+  }
+  def exitViewer = {
+    viewer.setVisible(false)
+    viewer.clear
+    focusToList
+  }
 
   def setLocation(path: String) = {
     currentLocation = path
@@ -68,16 +87,25 @@ class FileListController(val panel: AnchorPane,
     }
   }
 
-  def onListKeyPressed(e: KeyEvent) = {
-    println(s"${e.code} on ${e.target} from ${e.source}")
+  def onListKeyReleased(e: KeyEvent) = {
+    def _viewFile(file: File) = {
+      if (fs.canView(file)) {
+        val isJunctionOrSymlink = NativeUtils.isJunctionOrSymlink(file)
+        println(s"isJunctionOrSymlink: ${isJunctionOrSymlink}")
+        val isBinary = Utils.isBinaryFile(file)
+        println(s"isBinaryFile: ${isBinary}")
+        println(s"view file: ${file.getAbsolutePath}")
+        if (!isBinary) viewFile(file)
+      }
+    }
     e.code match {
       case KeyCode.Enter => {
         e.consume
-        val item = getCurrentItem
-        if (item.isDirectory && item.canRead) {
-          println(s"into directory: ${item.getCanonicalPath}")
-          setLocation(item.getCanonicalPath)
-        }
+        val file = getCurrentItem
+        if (file.isDirectory && file.canRead) {
+          println(s"into directory: ${file.getCanonicalPath}")
+          setLocation(file.getCanonicalPath)
+        } else _viewFile(file)
       }
       case KeyCode.BackSpace => {
         e.consume
@@ -89,11 +117,21 @@ class FileListController(val panel: AnchorPane,
           }
         }
       }
-      case KeyCode.Comma => e.consume
+      case KeyCode.Comma => {
+        e.consume
+        focusToLocation
+      }
       case KeyCode.E => {
         e.consume
         val file = getCurrentItem
-        if (!file.isDirectory) editFile(file)
+        if (fs.canChangeDirectory(file)) {
+          println(s"edit file: ${file.getAbsolutePath}")
+          editFile(file)
+        }
+      }
+      case KeyCode.V => {
+        e.consume
+        _viewFile(getCurrentItem)
       }
       case KeyCode.Q => {
         e.consume
@@ -103,11 +141,17 @@ class FileListController(val panel: AnchorPane,
       case _ =>
     }
   }
-  def onListKeyReleased(e: KeyEvent) = {
+
+  def onViewerKeyReleased(e: KeyEvent) = {
+    println(s"${e.code} on ${e.target} from ${e.source}")
     e.code match {
-      case KeyCode.Comma => {
-        e.consume()
-        focusToLocation
+      case KeyCode.Enter => {
+        e.consume
+        exitViewer
+      }
+      case KeyCode.Escape => {
+        e.consume
+        exitViewer
       }
       case _ =>
     }

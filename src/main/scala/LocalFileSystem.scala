@@ -18,4 +18,5 @@ object LocalFileSystem {
   def isDirectory(path: String) = new File(path).isDirectory
   def canChangeDirectory(file: File): Boolean = file.isDirectory && file.canRead
   def canChangeDirectory(path: String): Boolean = canChangeDirectory(new File(path))
+  def canView(file: File) = !file.isDirectory && file.canRead
 }
