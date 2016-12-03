@@ -3,15 +3,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 object LocalFileSystem {
-  def getList(path: String) = {
+  def getList(path: String): List[File] = {
     val f = new File(path)
 
     if (!f.exists || !f.isDirectory)
-      List[String]()
+      List[File]()
 
     f.listFiles
       .sortWith(sortFileList)
-      .map(formatFileProperty)
       .toList
   }
 
@@ -28,6 +27,13 @@ object LocalFileSystem {
   }
 
   def formatDateTime(time: Long) = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(new Date(time))
+
+  def getFileSizeString(file: File) = {
+    if (file.isDirectory)
+      "<DIR>"
+    else
+      file.length.toString
+  }
 
   def isExist(path: String) = new File(path).exists
   def isFile(path: String) = new File(path).isFile
