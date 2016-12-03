@@ -12,7 +12,7 @@ class FileListController(val panel: AnchorPane,
                           val list: ListView[File]) {
 
   val fs = LocalFileSystem
-  val defaultLocation = "C:/"
+  val defaultLocation = "C:/Users/temmings"
 
   def initialize = {
     list.cellFactory = (_: ListView[File]) => new ListCell[File](new FileListCell())
@@ -21,30 +21,54 @@ class FileListController(val panel: AnchorPane,
     }
     setLocation(defaultLocation)
   }
+  def getLocation = location.getText
+  def setLocation(path: String) = location.setText(path)
+  def getCurrentItem = list.getSelectionModel.getSelectedItem
+
+  def refreshFileList = {
+    if (fs.isDirectory(getLocation)) {
+      list.items = ObservableBuffer(fs.getList(getLocation))
+    }
+  }
 
   def onPanelKeyPressed(e: KeyEvent) = {
     println(s"press ${e.code} on Panel")
-    if (e.code == KeyCode.Escape) {
-      println("close stage")
-      FilerApp.stage.close()
+    e.code match {
+      case _ =>
     }
   }
 
   def onLocationKeyPressed(e: KeyEvent) = {
     println(s"press ${e.code} on Location")
+    e.code match {
+      case _ =>
+    }
   }
 
   def onListKeyPressed(e: KeyEvent) = {
     println(s"press ${e.code} on List")
-  }
-
-  def setLocation(path: String) = {
-    location.setText(path)
-  }
-
-  def refreshFileList = {
-    if (fs.isDirectory(location.getText)) {
-      list.items = ObservableBuffer(fs.getList(location.getText))
+    e.code match {
+      case KeyCode.Enter => {
+        if (getCurrentItem.isDirectory)
+          setLocation(getCurrentItem.getCanonicalPath)
+      }
+      case KeyCode.BackSpace => {
+        val current = new File(getLocation)
+        if (null != current) {
+          if (null != current.getParent) {
+            setLocation(current.getParent)
+          }
+        }
+      }
+      case KeyCode.Q => {
+        FilerApp.stage.close()
+        println("close stage")
+      }
+      case _ => {
+        // FIXME: delegate KeyEvent to Panel
+        println(s"delegate KeyEvent to Panel: ${e.code}")
+        onPanelKeyPressed(e)
+      }
     }
   }
 

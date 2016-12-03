@@ -12,17 +12,23 @@ public class FileListCell extends ListCell<File> {
     private final HBox container = new HBox(8.0, name, size, modTime);
 
     public FileListCell() {
-        name.setPrefWidth(450.0);
+        name.setPrefWidth(440.0);
         size.setPrefWidth(100.0);
         size.setAlignment(Pos.CENTER_RIGHT);
-        modTime.setPrefWidth(170.0);
+        modTime.setPrefWidth(130.0);
+        modTime.setAlignment(Pos.CENTER_RIGHT);
     }
 
     @Override
     protected void updateItem(File file, boolean empty){
         super.updateItem(file, empty);
-        if(empty) return;
-
+        if (null == file || empty) {
+            name.setText("");
+            size.setText("");
+            modTime.setText("");
+            setGraphic(container);
+            return;
+        }
         name.setText(file.getName());
         size.setText(LocalFileSystem.getFileSizeString(file));
         modTime.setText(LocalFileSystem.formatDateTime(file.lastModified()));

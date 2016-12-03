@@ -10,21 +10,11 @@ object LocalFileSystem {
       List[File]()
 
     f.listFiles
-      .sortWith(sortFileList)
+      .sortBy(sortCondition)
       .toList
   }
 
-  def sortFileList(a: File, b: File) = {
-    if (a.isDirectory && !b.isDirectory) true
-    else a.getName < b.getName
-  }
-
-  def formatFileProperty(file: File) = {
-    if (file.isDirectory)
-      f"${file.getName}%-65s ${"<DIR>"}%11s ${formatDateTime(file.lastModified)}"
-    else
-      f"${file.getName}%-65s ${file.length}%11d ${formatDateTime(file.lastModified)}"
-  }
+  def sortCondition(f: File) = (!f.isDirectory, f.getName)
 
   def formatDateTime(time: Long) = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(new Date(time))
 
