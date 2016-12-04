@@ -13,6 +13,7 @@ object LocalFileSystem {
 
   def sortCondition(f: File) = (!f.isDirectory, f.getName)
 
+  // Utilities
   def isExist(path: String) = new File(path).exists
   def isFile(path: String) = new File(path).isFile
   def isDirectory(path: String) = new File(path).isDirectory

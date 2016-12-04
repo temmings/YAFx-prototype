@@ -4,12 +4,12 @@ import scalafx.scene.Scene
 import scalafxml.core.{FXMLView, NoDependencyResolver}
 
 
-object FilerApp extends JFXApp {
-  val resource = getClass.getResource("FilerApp.fxml")
+object YAFx extends JFXApp {
+  val resource = getClass.getResource("YAFx.fxml")
   val root = FXMLView(resource, NoDependencyResolver)
 
   stage = new JFXApp.PrimaryStage() {
-    title = "FilerApp"
+    title = "YAFx"
     scene = new Scene(root)
   }
 }

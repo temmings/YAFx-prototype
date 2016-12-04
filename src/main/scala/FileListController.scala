@@ -135,8 +135,8 @@ class FileListController(
       }
       case KeyCode.Q => {
         e.consume
-        println(s"close ${FilerApp.stage}")
-        FilerApp.stage.close()
+        println(s"close ${YAFx.stage}")
+        YAFx.stage.close()
       }
       case _ =>
     }

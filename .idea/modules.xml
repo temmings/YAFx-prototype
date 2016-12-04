@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/filerapp.iml" filepath="$PROJECT_DIR$/.idea/modules/filerapp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/filerapp-build.iml" filepath="$PROJECT_DIR$/.idea/modules/filerapp-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/yafx.iml" filepath="$PROJECT_DIR$/.idea/modules/yafx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/yafx-build.iml" filepath="$PROJECT_DIR$/.idea/modules/yafx-build.iml" />
     </modules>
   </component>
 </project>
