@@ -38,14 +38,19 @@ public class FileListCell extends ListCell<File> {
         modTime.setText(Utils.formatDateTime(file.lastModified()));
         setGraphic(container);
 
+        // Windows specific
         if (Platform.isWindows()) {
             DosFileAttributes attr;
+            Boolean isJunction;
             try {
                 attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
+                isJunction = NativeUtils.isJunctionOrSymlink(file);
             } catch (IOException ioe) {
                 return;
             }
-
+            if (file.isDirectory() && isJunction) {
+                size.setText("<JCT>");
+            }
             if (attr.isSystem()) {
                 name.setStyle("-fx-text-fill: darkorchid;");
                 size.setStyle("-fx-text-fill: darkorchid;");
@@ -59,6 +64,7 @@ public class FileListCell extends ListCell<File> {
                 return;
             }
         }
+
         if (file.isHidden()) {
             name.setStyle("-fx-text-fill: blue;");
             size.setStyle("-fx-text-fill: blue;");
