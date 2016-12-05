@@ -33,7 +33,11 @@ public class FileListCell extends ListCell<File> {
         size.setText(Utils.getFileSizeString(file));
         modTime.setText(Utils.formatDateTime(file.lastModified()));
         setGraphic(container);
-        if (file.isDirectory()) {
+        if (file.isHidden()) {
+            name.setStyle("-fx-text-fill: blue;");
+            size.setStyle("-fx-text-fill: blue;");
+            modTime.setStyle("-fx-text-fill: blue;");
+        } else if (file.isDirectory()) {
             name.setStyle("-fx-text-fill: aqua;");
             size.setStyle("-fx-text-fill: aqua;");
             modTime.setStyle("-fx-text-fill: aqua;");
