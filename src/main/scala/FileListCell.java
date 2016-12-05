@@ -20,18 +20,27 @@ public class FileListCell extends ListCell<File> {
     }
 
     @Override
-    protected void updateItem(File file, boolean empty){
+    protected void updateItem(File file, boolean empty) {
         super.updateItem(file, empty);
         if (null == file || empty) {
             name.setText("");
             size.setText("");
             modTime.setText("");
-            setGraphic(container);
+            setGraphic(null);
             return;
         }
         name.setText(file.getName());
         size.setText(Utils.getFileSizeString(file));
         modTime.setText(Utils.formatDateTime(file.lastModified()));
         setGraphic(container);
+        if (file.isDirectory()) {
+            name.setStyle("-fx-text-fill: aqua;");
+            size.setStyle("-fx-text-fill: aqua;");
+            modTime.setStyle("-fx-text-fill: aqua;");
+        } else {
+            name.setStyle("-fx-text-fill: #DDDDDD;");
+            size.setStyle("-fx-text-fill: #DDDDDD;");
+            modTime.setStyle("-fx-text-fill: #DDDDDD;");
+        }
     }
 }
