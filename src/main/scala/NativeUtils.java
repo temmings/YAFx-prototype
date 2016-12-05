@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class NativeUtils {
+    /* http://stackoverflow.com/questions/3249117/cross-platform-way-to-detect-a-symbolic-link-junction-point/3286732 */
     interface Kernel32 extends Library {
         public int GetFileAttributesW(WString fileName);
     }

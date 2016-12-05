@@ -14,6 +14,7 @@ object Utils {
 
   /**
     *  Guess whether given file is binary. Just checks for anything under 0x09.
+    *  http://stackoverflow.com/questions/620993/determining-binary-text-file-type-in-java
     */
   def isBinaryFile(f: File): Boolean = {
     val in = new FileInputStream(f)
