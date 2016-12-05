@@ -1,9 +1,13 @@
+import com.sun.jna.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.DosFileAttributes;
 
 public class FileListCell extends ListCell<File> {
     private final Label name = new Label();
@@ -33,18 +37,48 @@ public class FileListCell extends ListCell<File> {
         size.setText(Utils.getFileSizeString(file));
         modTime.setText(Utils.formatDateTime(file.lastModified()));
         setGraphic(container);
+
+        if (Platform.isWindows()) {
+            DosFileAttributes attr;
+            try {
+                attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
+            } catch (IOException ioe) {
+                return;
+            }
+
+            if (attr.isSystem()) {
+                name.setStyle("-fx-text-fill: darkorchid;");
+                size.setStyle("-fx-text-fill: darkorchid;");
+                modTime.setStyle("-fx-text-fill: darkorchid;");
+                return;
+            }
+            if (attr.isReadOnly()) {
+                name.setStyle("-fx-text-fill: red;");
+                size.setStyle("-fx-text-fill: red;");
+                modTime.setStyle("-fx-text-fill: red;");
+                return;
+            }
+        }
         if (file.isHidden()) {
             name.setStyle("-fx-text-fill: blue;");
             size.setStyle("-fx-text-fill: blue;");
             modTime.setStyle("-fx-text-fill: blue;");
-        } else if (file.isDirectory()) {
+            return;
+        }
+        if (!file.canWrite()) {
+            name.setStyle("-fx-text-fill: red;");
+            size.setStyle("-fx-text-fill: red;");
+            modTime.setStyle("-fx-text-fill: red;");
+            return;
+        }
+        if (file.isDirectory()) {
             name.setStyle("-fx-text-fill: aqua;");
             size.setStyle("-fx-text-fill: aqua;");
             modTime.setStyle("-fx-text-fill: aqua;");
-        } else {
-            name.setStyle("-fx-text-fill: #DDDDDD;");
-            size.setStyle("-fx-text-fill: #DDDDDD;");
-            modTime.setStyle("-fx-text-fill: #DDDDDD;");
+            return;
         }
+        name.setStyle("-fx-text-fill: #DDDDDD;");
+        size.setStyle("-fx-text-fill: #DDDDDD;");
+        modTime.setStyle("-fx-text-fill: #DDDDDD;");
     }
 }
