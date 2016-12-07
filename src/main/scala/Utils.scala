@@ -17,6 +17,8 @@ object Utils {
     *  http://stackoverflow.com/questions/620993/determining-binary-text-file-type-in-java
     */
   def isBinaryFile(f: File): Boolean = {
+    // TODO: detect UTF-16
+    // TODO: detect BOM
     val in = new FileInputStream(f)
     val maxSize = 1024
     val size = if (in.available < maxSize) in.available else maxSize

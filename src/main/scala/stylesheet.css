@@ -16,6 +16,7 @@
     -fx-font-family: monospace;
 }
 
+/* inner file list cell */
 .label {
     -fx-text-fill: #DDDDDD;
     -fx-font-family: monospace;
