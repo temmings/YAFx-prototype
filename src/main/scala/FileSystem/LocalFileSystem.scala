@@ -2,7 +2,7 @@ package FileSystem
 
 import java.io.File
 
-object LocalFileSystem {
+class LocalFileSystem {
   def getList(f: File): List[File] = {
     if (!f.exists || !f.isDirectory)
       List[File]()

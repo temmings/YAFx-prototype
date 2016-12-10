@@ -17,7 +17,7 @@ class FileListController(
                           private val location: TextField,
                           private val list: ListView[File],
                           private val viewer: ViewerController) {
-  private val fs = LocalFileSystem
+  private val fs = new LocalFileSystem
   var currentLocation = ""
 
   location.setMouseTransparent(true)
@@ -25,7 +25,9 @@ class FileListController(
   location.onKeyReleased = onLocationKeyReleased
 
   list.setMouseTransparent(true)
-  list.cellFactory = (_: ListView[File]) => new ListCell[File](new FileListCell())
+  list.cellFactory = (_: ListView[File]) => fs match {
+    case _: LocalFileSystem => new ListCell[File](new FileListCell())
+  }
   list.onKeyReleased = onListKeyReleased
 
   setLocation(Configuration.App.defaultLocation)
