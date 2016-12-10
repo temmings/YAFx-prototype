@@ -1,5 +1,7 @@
 import java.io.File
 
+import Controller.{FileListController, ViewerController}
+
 import scalafx.application.JFXApp
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
@@ -12,39 +14,39 @@ object YAFx extends JFXApp {
   val location = new TextField {
     editable = true
     prefHeight = 25.0
-    prefWidth = Configuration.DefaultWindowWidth / 2
+    prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
   val fileList = new ListView[File] {
     editable = false
-    prefHeight = Configuration.DefaultWindowHeight
-    prefWidth = Configuration.DefaultWindowWidth / 2
+    prefHeight = Configuration.App.DefaultWindowHeight
+    prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
   val locationRight = new TextField {
     editable = true
     prefHeight = 25.0
-    prefWidth = Configuration.DefaultWindowWidth / 2
+    prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
   val fileListRight = new ListView[File] {
     editable = false
-    prefHeight = Configuration.DefaultWindowHeight
-    prefWidth = Configuration.DefaultWindowWidth / 2
+    prefHeight = Configuration.App.DefaultWindowHeight
+    prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
   val viewer = new TextArea {
     editable = false
     visible = false
     wrapText = true
-    prefHeight = Configuration.DefaultWindowHeight
-    prefWidth = Configuration.DefaultWindowWidth
+    prefHeight = Configuration.App.DefaultWindowHeight
+    prefWidth = Configuration.App.DefaultWindowWidth
   }
 
   val anchor = new AnchorPane {
     id = "mainPanel"
-    prefHeight = Configuration.DefaultWindowHeight
-    prefWidth = Configuration.DefaultWindowWidth
+    prefHeight = Configuration.App.DefaultWindowHeight
+    prefWidth = Configuration.App.DefaultWindowWidth
     stylesheets = Seq("stylesheet.css")
     children = Seq(
       new HBox {

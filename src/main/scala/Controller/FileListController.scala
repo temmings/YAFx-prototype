@@ -1,3 +1,5 @@
+package Controller
+
 import java.io.File
 
 import scala.io.Source
@@ -10,8 +12,15 @@ import scalafx.event.ActionEvent
 import scalafx.scene.control.{ListCell, ListView, TextArea, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
-class FileListController(val location: TextField, val list: ListView[File], val viewer: TextArea) {
-  val fs = LocalFileSystem
+import Control.FileListCell
+import FileSystem.{LocalFileSystem}
+import Utils.{Utils, NativeUtils}
+
+class FileListController(
+                          private val location: TextField,
+                          private val list: ListView[File],
+                          private val viewer: TextArea) {
+  private val fs = LocalFileSystem
   var currentLocation = ""
 
   location.setMouseTransparent(true)
@@ -23,7 +32,7 @@ class FileListController(val location: TextField, val list: ListView[File], val 
   list.onKeyReleased = onListKeyReleased
 
   Platform.runLater(list.requestFocus)
-  setLocation(Configuration.defaultLocation)
+  setLocation(Configuration.App.defaultLocation)
 
   def changeLocationHandler = {
     val path = location.getText
@@ -52,10 +61,10 @@ class FileListController(val location: TextField, val list: ListView[File], val 
     list.requestFocus
   }
 
-  def editFile(file: File) = Process(s"${Configuration.editor} ${file.getAbsolutePath}").run
+  def editFile(file: File) = Process(s"${Configuration.App.editor} ${file.getAbsolutePath}").run
 
   def viewFile(file: File) = {
-    val source = Source.fromFile(file, Configuration.ViewerDefaultCharset, Configuration.ViewerBufferSize)
+    val source = Source.fromFile(file, Configuration.App.ViewerDefaultCharset, Configuration.App.ViewerBufferSize)
     val lines = source.getLines
     val sb = new StringBuilder
     lines.foreach(l => sb.append(l + Properties.lineSeparator))
@@ -137,9 +146,7 @@ class FileListController(val location: TextField, val list: ListView[File], val 
   }
 
   def closeApp = {
-    println(s"close ${YAFx.stage}")
-    YAFx.stage.close()
-    //Platform.exit
+    Platform.exit
   }
 
 }

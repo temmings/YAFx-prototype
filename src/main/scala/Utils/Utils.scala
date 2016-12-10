@@ -1,7 +1,12 @@
+package Utils
+
 import java.io.{File, FileInputStream}
 import java.text.SimpleDateFormat
 import java.util.Date
 
+/**
+  * Created by temmings on 12/11/2016.
+  */
 object Utils {
   def formatDateTime(time: Long) = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(new Date(time))
 

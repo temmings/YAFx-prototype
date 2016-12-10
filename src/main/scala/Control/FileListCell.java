@@ -1,3 +1,6 @@
+package Control;
+
+import Utils.NativeUtils;
 import com.sun.jna.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -8,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.DosFileAttributes;
+
+import Utils.Utils;
 
 public class FileListCell extends ListCell<File> {
     private final Label name = new Label();
@@ -22,7 +27,7 @@ public class FileListCell extends ListCell<File> {
         modTime.setAlignment(Pos.CENTER_RIGHT);
         // TODO: calc name label size
         double nameWidth =
-                Configuration.DefaultWindowWidth() / 2
+                Configuration.App.DefaultWindowWidth() / 2
                         - size.getPrefWidth()
                         - modTime.getPrefWidth()
                         - container.getSpacing() * (1 + container.getChildren().size());
@@ -47,18 +52,18 @@ public class FileListCell extends ListCell<File> {
         }
 
         if (file.isHidden()) {
-            setItemColor(Configuration.HiddenFileColor());
+            setItemColor(Configuration.App.HiddenFileColor());
             return;
         }
         if (!file.canWrite()) {
-            setItemColor(Configuration.ReadOnlyFileColor());
+            setItemColor(Configuration.App.ReadOnlyFileColor());
             return;
         }
         if (file.isDirectory()) {
-            setItemColor(Configuration.DirectoryColor());
+            setItemColor(Configuration.App.DirectoryColor());
             return;
         }
-        setItemColor(Configuration.DefaultFileColor());
+        setItemColor(Configuration.App.DefaultFileColor());
     }
 
     private Boolean setWindowsItemColor(File file) {
@@ -74,11 +79,11 @@ public class FileListCell extends ListCell<File> {
             size.setText("<JCT>");
         }
         if (attr.isSystem()) {
-            setItemColor(Configuration.SystemFileColor());
+            setItemColor(Configuration.App.SystemFileColor());
             return true;
         }
         if (attr.isReadOnly()) {
-            setItemColor(Configuration.ReadOnlyFileColor());
+            setItemColor(Configuration.App.ReadOnlyFileColor());
             return true;
         }
         return false;
