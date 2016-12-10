@@ -2,14 +2,11 @@ package Controller
 
 import java.io.File
 
-import scala.io.Source
 import scala.sys.process.Process
-import scala.util.Properties
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
-import scalafx.event.ActionEvent
-import scalafx.scene.control.{ListCell, ListView, TextArea, TextField}
+import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
 import Control.FileListCell
@@ -19,7 +16,7 @@ import Utils.{Utils, NativeUtils}
 class FileListController(
                           private val location: TextField,
                           private val list: ListView[File],
-                          private val viewer: TextArea) {
+                          private val viewer: ViewerController) {
   private val fs = LocalFileSystem
   var currentLocation = ""
 
@@ -31,7 +28,6 @@ class FileListController(
   list.cellFactory = (_: ListView[File]) => new ListCell[File](new FileListCell())
   list.onKeyReleased = onListKeyReleased
 
-  Platform.runLater(list.requestFocus)
   setLocation(Configuration.App.defaultLocation)
 
   def changeLocationHandler = {
@@ -44,13 +40,13 @@ class FileListController(
   def setLocation(path: String) = {
     currentLocation = path
     location.setText(path)
-    refreshFileList
+    refresh
     list.getSelectionModel.select(0)
   }
   def undoLocation = location.setText(currentLocation)
 
   def getCurrentItem = list.getSelectionModel.getSelectedItem
-  def refreshFileList = list.items = ObservableBuffer(fs.getList(currentLocation))
+  def refresh = list.items = ObservableBuffer(fs.getList(currentLocation))
 
   def focusToLocation = {
     println(s"focus to ${location}")
@@ -61,18 +57,14 @@ class FileListController(
     list.requestFocus
   }
 
+  def closeApp = {
+    Platform.exit
+  }
+
   def editFile(file: File) = Process(s"${Configuration.App.editor} ${file.getAbsolutePath}").run
 
   def viewFile(file: File) = {
-    val source = Source.fromFile(file, Configuration.App.ViewerDefaultCharset, Configuration.App.ViewerBufferSize)
-    val lines = source.getLines
-    val sb = new StringBuilder
-    lines.foreach(l => sb.append(l + Properties.lineSeparator))
-    source.close
-    viewer.setText(sb.toString)
-    viewer.setScrollTop(Double.MinValue)
-    viewer.setVisible(true)
-    viewer.requestFocus
+    viewer.open(list, file)
   }
 
   def onLocationKeyReleased(e: KeyEvent) = {
@@ -140,13 +132,4 @@ class FileListController(
       case _ =>
     }
   }
-
-  def onClose(e: ActionEvent): Unit = {
-    closeApp
-  }
-
-  def closeApp = {
-    Platform.exit
-  }
-
 }

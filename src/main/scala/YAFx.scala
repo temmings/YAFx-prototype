@@ -2,7 +2,7 @@ import java.io.File
 
 import Controller.{FileListController, ViewerController}
 
-import scalafx.application.JFXApp
+import scalafx.application.{JFXApp, Platform}
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
@@ -77,7 +77,8 @@ object YAFx extends JFXApp {
     scene = new Scene(anchor)
   }
 
-  val fileListController = new FileListController(location, fileList, viewer)
-  val fileListRightController = new FileListController(locationRight, fileListRight, viewer)
-  val viewerController = new ViewerController(viewer, fileList)
+  val viewerController = new ViewerController(viewer)
+  val fileListController = new FileListController(location, fileList, viewerController)
+  val fileListRightController = new FileListController(locationRight, fileListRight, viewerController)
+  Platform.runLater(fileList.requestFocus)
 }
