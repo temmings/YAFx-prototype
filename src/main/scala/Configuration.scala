@@ -5,4 +5,10 @@ object Configuration {
   val stylesheet = "stylesheet.css"
   val ViewerBufferSize = 1024 * 64
   val ViewerDefaultCharset = "utf-8"
+
+  val DefaultFileColor = "#DDDDDD"
+  val SystemFileColor = "darkorchid"
+  val ReadOnlyFileColor = "red"
+  val HiddenFileColor = "blue"
+  val DirectoryColor = "aqua"
 }

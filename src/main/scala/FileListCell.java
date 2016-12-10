@@ -27,64 +27,59 @@ public class FileListCell extends ListCell<File> {
     protected void updateItem(File file, boolean empty) {
         super.updateItem(file, empty);
         if (null == file || empty) {
-            name.setText("");
-            size.setText("");
-            modTime.setText("");
             setGraphic(null);
             return;
         }
+        setGraphic(container);
         name.setText(file.getName());
         size.setText(Utils.getFileSizeString(file));
         modTime.setText(Utils.formatDateTime(file.lastModified()));
-        setGraphic(container);
 
         // Windows specific
         if (Platform.isWindows()) {
-            DosFileAttributes attr;
-            Boolean isJunction;
-            try {
-                attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
-                isJunction = NativeUtils.isJunctionOrSymlink(file);
-            } catch (IOException ioe) {
-                return;
-            }
-            if (file.isDirectory() && isJunction) {
-                size.setText("<JCT>");
-            }
-            if (attr.isSystem()) {
-                name.setStyle("-fx-text-fill: darkorchid;");
-                size.setStyle("-fx-text-fill: darkorchid;");
-                modTime.setStyle("-fx-text-fill: darkorchid;");
-                return;
-            }
-            if (attr.isReadOnly()) {
-                name.setStyle("-fx-text-fill: red;");
-                size.setStyle("-fx-text-fill: red;");
-                modTime.setStyle("-fx-text-fill: red;");
-                return;
-            }
+            if (setWindowsItemColor(file)) return;
         }
 
         if (file.isHidden()) {
-            name.setStyle("-fx-text-fill: blue;");
-            size.setStyle("-fx-text-fill: blue;");
-            modTime.setStyle("-fx-text-fill: blue;");
+            setItemColor(Configuration.HiddenFileColor());
             return;
         }
         if (!file.canWrite()) {
-            name.setStyle("-fx-text-fill: red;");
-            size.setStyle("-fx-text-fill: red;");
-            modTime.setStyle("-fx-text-fill: red;");
+            setItemColor(Configuration.ReadOnlyFileColor());
             return;
         }
         if (file.isDirectory()) {
-            name.setStyle("-fx-text-fill: aqua;");
-            size.setStyle("-fx-text-fill: aqua;");
-            modTime.setStyle("-fx-text-fill: aqua;");
+            setItemColor(Configuration.DirectoryColor());
             return;
         }
-        name.setStyle("-fx-text-fill: #DDDDDD;");
-        size.setStyle("-fx-text-fill: #DDDDDD;");
-        modTime.setStyle("-fx-text-fill: #DDDDDD;");
+        setItemColor(Configuration.DefaultFileColor());
+    }
+
+    private Boolean setWindowsItemColor(File file) {
+        DosFileAttributes attr;
+        Boolean isJunction;
+        try {
+            attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
+            isJunction = NativeUtils.isJunctionOrSymlink(file);
+        } catch (IOException ioe) {
+            return true;
+        }
+        if (file.isDirectory() && isJunction) {
+            size.setText("<JCT>");
+        }
+        if (attr.isSystem()) {
+            setItemColor(Configuration.SystemFileColor());
+            return true;
+        }
+        if (attr.isReadOnly()) {
+            setItemColor(Configuration.ReadOnlyFileColor());
+            return true;
+        }
+        return false;
+    }
+
+    private void setItemColor(String color) {
+        container.getChildren()
+                .forEach(n -> n.setStyle(String.format("-fx-text-fill: %s;", color)));
     }
 }
