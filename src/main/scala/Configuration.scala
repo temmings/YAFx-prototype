@@ -11,4 +11,7 @@ object Configuration {
   val ReadOnlyFileColor = "red"
   val HiddenFileColor = "blue"
   val DirectoryColor = "aqua"
+
+  val DefaultWindowHeight = 480.0
+  val DefaultWindowWidth = 1024.0
 }

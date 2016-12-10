@@ -16,11 +16,17 @@ public class FileListCell extends ListCell<File> {
     private final HBox container = new HBox(8.0, name, size, modTime);
 
     public FileListCell() {
-        name.setPrefWidth(440.0);
         size.setPrefWidth(100.0);
         size.setAlignment(Pos.CENTER_RIGHT);
         modTime.setPrefWidth(130.0);
         modTime.setAlignment(Pos.CENTER_RIGHT);
+        // TODO: calc name label size
+        double nameWidth =
+                Configuration.DefaultWindowWidth() / 2
+                        - size.getPrefWidth()
+                        - modTime.getPrefWidth()
+                        - container.getSpacing() * (1 + container.getChildren().size());
+        name.setPrefWidth(nameWidth);
     }
 
     @Override
