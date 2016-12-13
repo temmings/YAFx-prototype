@@ -7,6 +7,7 @@ object App {
   val stylesheet = "stylesheet.css"
   val ViewerBufferSize = 1024 * 64
   val ViewerDefaultCharset = "utf-8"
+  val SeparateExtensionMaxLength = 4
 
   val DefaultFileColor = "#DDDDDD"
   val SystemFileColor = "darkorchid"
