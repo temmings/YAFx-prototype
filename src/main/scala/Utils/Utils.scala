@@ -24,7 +24,7 @@ object Utils {
     var other = 0
 
     for (i <- 0 to data.length-1) {
-      var b = data(i)
+      val b = data(i)
       //println(f"$i: $b : $b%02X")
       if (0x00 <= b && b < 0x09) return true
 
