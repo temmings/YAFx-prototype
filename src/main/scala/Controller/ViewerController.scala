@@ -8,7 +8,8 @@ import scalafx.Includes._
 import scalafx.scene.control.{Control, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
-class ViewerController(private val viewer: TextArea) {
+case class ViewerController(viewer: TextArea) {
+  viewer.onKeyPressed = onKeyPressed
   viewer.onKeyReleased = onKeyReleased
   var sourceControl: Control = null
 
@@ -32,18 +33,24 @@ class ViewerController(private val viewer: TextArea) {
     sourceControl.requestFocus
   }
 
-  def onKeyReleased(e: KeyEvent) = {
-    println(s"${e.code} on ${e.target} from ${e.source}")
+  def onKeyPressed(e: KeyEvent) = {
+    println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
     e.code match {
-      case KeyCode.Enter => {
+      // defaults
+      case KeyCode.Down | KeyCode.Up | KeyCode.Space
+           | KeyCode.PageDown | KeyCode.PageUp =>
+      case _ => {
         e.consume
-        close
+        e.code match {
+          case KeyCode.Enter => close
+          case KeyCode.Escape => close
+          case _ =>
+        }
       }
-      case KeyCode.Escape => {
-        e.consume
-        close
-      }
-      case _ =>
     }
+  }
+  def onKeyReleased(e: KeyEvent) = {
+    println(s"Released: ${e.code} on ${e.target} from ${e.source}")
+    e.consume
   }
 }

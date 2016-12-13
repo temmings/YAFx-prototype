@@ -19,7 +19,7 @@ object YAFx extends JFXApp {
 
   val fileList = new ListView[File] {
     editable = false
-    prefHeight = Configuration.App.DefaultWindowHeight
+    prefHeight = Configuration.App.DefaultWindowHeight - location.getPrefHeight
     prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
@@ -31,7 +31,7 @@ object YAFx extends JFXApp {
 
   val fileListRight = new ListView[File] {
     editable = false
-    prefHeight = Configuration.App.DefaultWindowHeight
+    prefHeight = Configuration.App.DefaultWindowHeight - locationRight.getPrefHeight
     prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
@@ -77,8 +77,10 @@ object YAFx extends JFXApp {
     scene = new Scene(anchor)
   }
 
-  val viewerController = new ViewerController(viewer)
-  val fileListController = new FileListController(location, fileList, viewerController)
-  val fileListRightController = new FileListController(locationRight, fileListRight, viewerController)
+  val viewerController = ViewerController(viewer)
+  val fileListController = FileListController(location, fileList, viewerController)
+  val fileListRightController = FileListController(locationRight, fileListRight, viewerController)
+  fileListController.setPairFileListController(fileListRightController)
+  fileListRightController.setPairFileListController(fileListController)
   Platform.runLater(fileList.requestFocus)
 }

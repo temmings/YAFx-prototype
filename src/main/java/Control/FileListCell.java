@@ -1,6 +1,5 @@
 package Control;
 
-import Utils.NativeUtils;
 import com.sun.jna.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -13,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.DosFileAttributes;
 
 import Utils.Utils;
+import Utils.NativeUtils;
 
 public class FileListCell extends ListCell<File> {
     private final Label name = new Label();
