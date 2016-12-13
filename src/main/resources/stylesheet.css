@@ -1,44 +1,36 @@
+* {
+    -fx-font-family: monospace;
+}
+
 .text-field {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 .text-area {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 .content {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 /* inner file list cell */
 .label {
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 .list-cell {
     -fx-background-color: black;
-    -fx-text-fill: white;
-    -fx-font-family: monospace;
+    -fx-text-fill: #DDDDDD;
     -fx-padding: 0px 2px 0px 6px;
 }
 
 .list-cell:filled:selected {
     /* -fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%); */
     -fx-background-color: purple;
-}
-
-.list-cell:even {
-    -fx-background-color: black;
-}
-
-.list-cell:filled:hover {
 }
 
 /* Disable scroll bar */
