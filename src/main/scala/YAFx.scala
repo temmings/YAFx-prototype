@@ -1,5 +1,3 @@
-import java.io.File
-
 import Controller.{FileListController, ViewerController}
 
 import scalafx.application.{JFXApp, Platform}
@@ -7,6 +5,8 @@ import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
 import scalafx.scene.layout.{AnchorPane, HBox, VBox}
+
+import Utils.ListFile
 
 
 object YAFx extends JFXApp {
@@ -17,7 +17,7 @@ object YAFx extends JFXApp {
     prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
-  val fileList = new ListView[File] {
+  val fileList = new ListView[ListFile] {
     editable = false
     prefHeight = Configuration.App.DefaultWindowHeight - location.getPrefHeight
     prefWidth = Configuration.App.DefaultWindowWidth / 2
@@ -29,7 +29,7 @@ object YAFx extends JFXApp {
     prefWidth = Configuration.App.DefaultWindowWidth / 2
   }
 
-  val fileListRight = new ListView[File] {
+  val fileListRight = new ListView[ListFile] {
     editable = false
     prefHeight = Configuration.App.DefaultWindowHeight - locationRight.getPrefHeight
     prefWidth = Configuration.App.DefaultWindowWidth / 2

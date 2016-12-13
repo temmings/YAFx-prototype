@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.DosFileAttributes;
 
-import Utils.Utils;
+import Utils.ListFile;
 import Utils.NativeUtils;
 
-public class FileListCell extends ListCell<File> {
+public class FileListCell extends ListCell<ListFile> {
     private final Label name = new Label();
     private final Label size = new Label();
     private final Label modTime = new Label();
@@ -35,31 +35,31 @@ public class FileListCell extends ListCell<File> {
     }
 
     @Override
-    protected void updateItem(File file, boolean empty) {
+    protected void updateItem(ListFile file, boolean empty) {
         super.updateItem(file, empty);
         if (null == file || empty) {
             setGraphic(null);
             return;
         }
         setGraphic(container);
-        name.setText(file.getName());
-        size.setText(Utils.getFileSizeString(file));
-        modTime.setText(Utils.formatDateTime(file.lastModified()));
+        name.setText(file.name());
+        size.setText(file.sizeOrTypeString());
+        modTime.setText(file.modifiedTimeString());
 
         // Windows specific
         if (Platform.isWindows()) {
-            if (setWindowsItemColor(file)) return;
+            if (setWindowsItemColor(file.toFile())) return;
         }
 
-        if (file.isHidden()) {
+        if (file.toFile().isHidden()) {
             setItemColor(Configuration.App.HiddenFileColor());
             return;
         }
-        if (!file.canWrite()) {
+        if (!file.toFile().canWrite()) {
             setItemColor(Configuration.App.ReadOnlyFileColor());
             return;
         }
-        if (file.isDirectory()) {
+        if (file.toFile().isDirectory()) {
             setItemColor(Configuration.App.DirectoryColor());
             return;
         }

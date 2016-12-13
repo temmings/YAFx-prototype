@@ -1,22 +1,11 @@
 package Utils
 
 import java.io.{File, FileInputStream}
-import java.text.SimpleDateFormat
-import java.util.Date
 
 /**
   * Created by temmings on 12/11/2016.
   */
 object Utils {
-  def formatDateTime(time: Long) = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(new Date(time))
-
-  def getFileSizeString(file: File) = {
-    if (file.isDirectory)
-      "<DIR>"
-    else
-      file.length.toString
-  }
-
   /**
     *  Guess whether given file is binary. Just checks for anything under 0x09.
     *  http://stackoverflow.com/questions/620993/determining-binary-text-file-type-in-java

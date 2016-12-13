@@ -2,16 +2,24 @@ package FileSystem
 
 import java.io.File
 
-case class LocalFileSystem() {
-  def getList(f: File): List[File] = {
-    if (!f.exists || !f.isDirectory)
-      List[File]()
+import Utils.ListFile
 
-    f.listFiles()
-      .sortBy(sortCondition)
-      .toList
+case class LocalFileSystem() {
+  def getList(f: File): List[ListFile] = {
+    if (!f.exists || !f.isDirectory)
+      return List[ListFile]()
+
+    val list = f.listFiles()
+        .sortBy(sortCondition)
+        .map(f => ListFile(f, f.getName))
+        .toList
+
+    if (null == f.getParentFile)
+      return list
+
+    return List[ListFile](ListFile(f.getParentFile, "..")) ++ list
   }
-  def getList(path: String): List[File] = getList(new File(path))
+  def getList(path: String): List[ListFile] = getList(new File(path))
 
   def sortCondition(f: File) = (!f.isDirectory, f.getName)
 

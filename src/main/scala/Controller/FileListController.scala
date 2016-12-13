@@ -1,7 +1,7 @@
 package Controller
 
 import java.io.File
-import java.nio.file.{Path}
+import java.nio.file.Path
 import javafx.collections.ObservableList
 
 import scala.sys.process.Process
@@ -12,11 +12,11 @@ import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import Control.FileListCell
 import FileSystem.LocalFileSystem
-import Utils.Utils
+import Utils.{ListFile, Utils}
 
 case class FileListController(
                                location: TextField,
-                               list: ListView[File],
+                               list: ListView[ListFile],
                                viewer: ViewerController) {
   private val fs = LocalFileSystem()
   private var pairFileList: FileListController = null
@@ -27,8 +27,8 @@ case class FileListController(
   location.onKeyPressed = onLocationKeyPressed
 
   list.setMouseTransparent(true)
-  list.cellFactory = (_: ListView[File]) => fs match {
-    case LocalFileSystem() => new ListCell[File](new FileListCell())
+  list.cellFactory = (_: ListView[ListFile]) => fs match {
+    case LocalFileSystem() => new ListCell[ListFile](new FileListCell())
   }
   list.onKeyPressed = onListKeyPressed
   list.onKeyReleased = onListKeyReleased
@@ -114,12 +114,12 @@ case class FileListController(
         e.code match {
           case KeyCode.Tab => pairFileList.focusToList
           case KeyCode.Enter =>
-            if (getCurrentItem.isDirectory) cd(getCurrentItem)
-            else viewFile(getCurrentItem)
+            if (getCurrentItem.toFile.isDirectory) cd(getCurrentItem.toFile)
+            else viewFile(getCurrentItem.toFile)
           case KeyCode.BackSpace => cd(currentLocation.getParent.toFile)
           //case KeyCode.C => copyFile(list.getSelectionModel.getSelectedItems)
-          case KeyCode.E => editFile(getCurrentItem)
-          case KeyCode.V => viewFile(getCurrentItem)
+          case KeyCode.E => editFile(getCurrentItem.toFile)
+          case KeyCode.V => viewFile(getCurrentItem.toFile)
           case KeyCode.Q => closeApp
           case _ =>
 
