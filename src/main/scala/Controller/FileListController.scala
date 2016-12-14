@@ -33,7 +33,7 @@ case class FileListController(
   list.onKeyPressed = onListKeyPressed
   list.onKeyReleased = onListKeyReleased
 
-  setLocation(Configuration.App.defaultLocation)
+  setLocation(Configuration.App.DefaultLocation)
 
   def changeLocationHandler = {
     val path = location.getText
@@ -71,7 +71,7 @@ case class FileListController(
 
   def editFile(file: File) = {
     println(s"edit file: ${file.getAbsolutePath}")
-    Process(s"${Configuration.App.editor} ${file.getAbsolutePath}").run
+    Process(s"${Configuration.App.Editor} ${file.getAbsolutePath}").run
   }
 
   def viewFile(file: File) = {
