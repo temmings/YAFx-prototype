@@ -47,7 +47,7 @@ object YAFx extends JFXApp {
     id = "mainPanel"
     prefHeight = Configuration.App.DefaultWindowHeight
     prefWidth = Configuration.App.DefaultWindowWidth
-    stylesheets = Seq("stylesheet.css")
+    stylesheets = Seq(Configuration.App.Stylesheet)
     children = Seq(
       new HBox {
         alignment = Pos.Center

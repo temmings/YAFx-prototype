@@ -1,31 +1,25 @@
+* {
+    -fx-font-family: monospace;
+}
+
 .text-field {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 .text-area {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 .content {
     -fx-background-color: black;
     -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
-}
-
-/* inner file list cell */
-.label {
-    -fx-text-fill: #DDDDDD;
-    -fx-font-family: monospace;
 }
 
 .list-cell {
     -fx-background-color: black;
     -fx-text-fill: white;
-    -fx-font-family: monospace;
     -fx-padding: 0px 2px 0px 6px;
 }
 
@@ -47,4 +41,31 @@
 .list-view .scroll-bar .increment-button,
 .list-view .scroll-bar .decrement-button {
     -fx-padding: 0px;
+}
+
+/* inner file list cell */
+.yafx-file {
+    -fx-text-fill: gainsboro;
+}
+.yafx-file-attr-directory {
+    -fx-text-fill: aqua;
+}
+.yafx-file-attr-hidden {
+    -fx-text-fill: blue;
+}
+.yafx-file-attr-readonly {
+    -fx-text-fill: red;
+}
+.yafx-file-attr-win-system {
+    -fx-text-fill: darkorchid;
+}
+.yafx-file-attr-win-readonly {
+    -fx-text-fill: red;
+}
+.yafx-file-attr-win-junction {
+    -fx-text-fill: yellowgreen;
+}
+/* color of extension */
+.yafx-file-ext-zip {
+    -fx-text-fill: aqua;
 }
