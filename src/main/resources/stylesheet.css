@@ -17,14 +17,9 @@
     -fx-text-fill: #DDDDDD;
 }
 
-/* inner file list cell */
-.label {
-    -fx-text-fill: #DDDDDD;
-}
-
 .list-cell {
     -fx-background-color: black;
-    -fx-text-fill: #DDDDDD;
+    -fx-text-fill: white;
     -fx-padding: 0px 2px 0px 6px;
 }
 
@@ -33,10 +28,44 @@
     -fx-background-color: purple;
 }
 
+.list-cell:even {
+    -fx-background-color: black;
+}
+
+.list-cell:filled:hover {
+}
+
 /* Disable scroll bar */
 .list-view .scroll-bar .increment-arrow,
 .list-view .scroll-bar .decrement-arrow,
 .list-view .scroll-bar .increment-button,
 .list-view .scroll-bar .decrement-button {
     -fx-padding: 0px;
+}
+
+/* inner file list cell */
+.yafx-file {
+    -fx-text-fill: gainsboro;
+}
+.yafx-file-attr-directory {
+    -fx-text-fill: aqua;
+}
+.yafx-file-attr-hidden {
+    -fx-text-fill: blue;
+}
+.yafx-file-attr-readonly {
+    -fx-text-fill: red;
+}
+.yafx-file-attr-win-system {
+    -fx-text-fill: darkorchid;
+}
+.yafx-file-attr-win-readonly {
+    -fx-text-fill: red;
+}
+.yafx-file-attr-win-junction {
+    -fx-text-fill: yellowgreen;
+}
+/* color of extension */
+.yafx-file-ext-zip {
+    -fx-text-fill: aqua;
 }

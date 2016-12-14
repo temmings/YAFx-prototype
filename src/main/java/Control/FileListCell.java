@@ -4,8 +4,6 @@ import com.sun.jna.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.effect.BoxBlur;
-import javafx.scene.effect.Lighting;
 import javafx.scene.layout.HBox;
 
 import java.io.File;
@@ -40,12 +38,14 @@ public class FileListCell extends ListCell<ListFile> {
             setGraphic(null);
             return;
         }
+        clearStyleClass();
         setGraphic(container);
         if (file.hasExtension()
                 && 0 < file.nameWithoutExtension().length()
                 && file.extension().length() <= Configuration.App.SeparateExtensionMaxLength()) {
             name.setText(file.nameWithoutExtension());
             ext.setText('.' + file.extension());
+            ext.getStyleClass().add(String.format("yafx-file-ext-%s", file.extension()));
         } else {
             name.setText(file.name());
             ext.setText("");
@@ -53,51 +53,37 @@ public class FileListCell extends ListCell<ListFile> {
         size.setText(file.sizeOrTypeString());
         modTime.setText(file.modifiedTimeString());
 
-        // Windows specific
-        if (Platform.isWindows()) {
-            if (setWindowsItemColor(file.toFile())) return;
-        }
+        addStyleClass("yafx-file");
+        if (file.toFile().isHidden()) addStyleClass("yafx-file-attr-hidden");
+        if (!file.toFile().canWrite()) addStyleClass("yafx-file-attr-readonly");
+        if (file.toFile().isDirectory()) addStyleClass("yafx-file-attr-directory");
 
-        if (file.toFile().isHidden()) {
-            setItemColor(Configuration.App.HiddenFileColor());
-            return;
-        }
-        if (!file.toFile().canWrite()) {
-            setItemColor(Configuration.App.ReadOnlyFileColor());
-            return;
-        }
-        if (file.toFile().isDirectory()) {
-            setItemColor(Configuration.App.DirectoryColor());
-            return;
-        }
-        setItemColor(Configuration.App.DefaultFileColor());
+        // Windows specific
+        if (Platform.isWindows()) setWindowsItemColor(file.toFile());
     }
 
-    private Boolean setWindowsItemColor(File file) {
+    private void setWindowsItemColor(File file) {
         DosFileAttributes attr;
         Boolean isJunction;
         try {
             attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
             isJunction = NativeUtils.isJunctionOrSymlink(file);
         } catch (IOException ioe) {
-            return true;
+            System.out.println(ioe.getMessage());
+            return;
         }
-        if (file.isDirectory() && isJunction) {
-            size.setText("<JCT>");
-        }
-        if (attr.isSystem()) {
-            setItemColor(Configuration.App.SystemFileColor());
-            return true;
-        }
-        if (attr.isReadOnly()) {
-            setItemColor(Configuration.App.ReadOnlyFileColor());
-            return true;
-        }
-        return false;
+        if (file.isDirectory() && isJunction) size.setText("<JCT>");
+        if (attr.isSystem()) addStyleClass("yafx-file-attr-win-system");
+        if (attr.isReadOnly()) addStyleClass("yafx-file-attr-win-readonly");
+        if (isJunction) addStyleClass("yafx-file-attr-win-junction");
     }
 
-    private void setItemColor(String color) {
+    private void addStyleClass(String name) {
         container.getChildren()
-                .forEach(n -> n.setStyle(String.format("-fx-text-fill: %s;", color)));
+                .forEach(n -> n.getStyleClass().add(name));
+    }
+
+    private void clearStyleClass() {
+        container.getChildren().forEach(n -> n.getStyleClass().clear());
     }
 }
