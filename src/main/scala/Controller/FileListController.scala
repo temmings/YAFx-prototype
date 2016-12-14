@@ -10,9 +10,9 @@ import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
-import Control.FileListCell
+import Control.{FileListCell, ListFile}
 import FileSystem.LocalFileSystem
-import Utils.{ListFile, Utils}
+import Utils.Utils
 
 case class FileListController(
                                location: TextField,

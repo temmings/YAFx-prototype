@@ -1,3 +1,4 @@
+import Control.ListFile
 import Controller.{FileListController, ViewerController}
 
 import scalafx.application.{JFXApp, Platform}
@@ -5,8 +6,6 @@ import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
 import scalafx.scene.layout.{AnchorPane, HBox, VBox}
-
-import Utils.ListFile
 
 
 object YAFx extends JFXApp {

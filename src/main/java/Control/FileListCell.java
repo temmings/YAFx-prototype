@@ -11,9 +11,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.DosFileAttributes;
 
-import Utils.ListFile;
 import Utils.NativeUtils;
 
+/**
+ * see also: http://blog.livedoor.jp/fukai_yas/archives/47274295.html
+ */
 public class FileListCell extends ListCell<ListFile> {
     private final Label name = new Label();
     private final Label ext = new Label();
