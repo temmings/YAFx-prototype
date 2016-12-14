@@ -16,22 +16,19 @@ import Utils.NativeUtils;
 
 public class FileListCell extends ListCell<ListFile> {
     private final Label name = new Label();
+    private final Label ext = new Label();
     private final Label size = new Label();
     private final Label modTime = new Label();
-    private final HBox container = new HBox(8.0, name, size, modTime);
+    private final HBox container = new HBox(0.0, name, ext, size, modTime);
 
     public FileListCell() {
         size.setPrefWidth(100.0);
         size.setAlignment(Pos.CENTER_RIGHT);
         modTime.setPrefWidth(130.0);
         modTime.setAlignment(Pos.CENTER_RIGHT);
+        ext.setPrefWidth(40.0);
         // TODO: calc name label size
-        double nameWidth =
-                Configuration.App.DefaultWindowWidth() / 2
-                        - size.getPrefWidth()
-                        - modTime.getPrefWidth()
-                        - container.getSpacing() * (1 + container.getChildren().size());
-        name.setPrefWidth(nameWidth);
+        name.setPrefWidth(230.0);
     }
 
     @Override
@@ -41,56 +38,52 @@ public class FileListCell extends ListCell<ListFile> {
             setGraphic(null);
             return;
         }
+        clearStyleClass();
         setGraphic(container);
-        name.setText(file.name());
+        if (file.hasExtension()
+                && 0 < file.nameWithoutExtension().length()
+                && file.extension().length() <= Configuration.App.SeparateExtensionMaxLength()) {
+            name.setText(file.nameWithoutExtension());
+            ext.setText('.' + file.extension());
+            ext.getStyleClass().add(String.format("yafx-file-ext-%s", file.extension()));
+        } else {
+            name.setText(file.name());
+            ext.setText("");
+        }
         size.setText(file.sizeOrTypeString());
         modTime.setText(file.modifiedTimeString());
 
-        // Windows specific
-        if (Platform.isWindows()) {
-            if (setWindowsItemColor(file.toFile())) return;
-        }
+        addStyleClass("yafx-file");
+        if (file.toFile().isHidden()) addStyleClass("yafx-file-attr-hidden");
+        if (!file.toFile().canWrite()) addStyleClass("yafx-file-attr-readonly");
+        if (file.toFile().isDirectory()) addStyleClass("yafx-file-attr-directory");
 
-        if (file.toFile().isHidden()) {
-            setItemColor(Configuration.App.HiddenFileColor());
-            return;
-        }
-        if (!file.toFile().canWrite()) {
-            setItemColor(Configuration.App.ReadOnlyFileColor());
-            return;
-        }
-        if (file.toFile().isDirectory()) {
-            setItemColor(Configuration.App.DirectoryColor());
-            return;
-        }
-        setItemColor(Configuration.App.DefaultFileColor());
+        // Windows specific
+        if (Platform.isWindows()) setWindowsItemColor(file.toFile());
     }
 
-    private Boolean setWindowsItemColor(File file) {
+    private void setWindowsItemColor(File file) {
         DosFileAttributes attr;
         Boolean isJunction;
         try {
             attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
             isJunction = NativeUtils.isJunctionOrSymlink(file);
         } catch (IOException ioe) {
-            return true;
+            System.out.println(ioe.getMessage());
+            return;
         }
-        if (file.isDirectory() && isJunction) {
-            size.setText("<JCT>");
-        }
-        if (attr.isSystem()) {
-            setItemColor(Configuration.App.SystemFileColor());
-            return true;
-        }
-        if (attr.isReadOnly()) {
-            setItemColor(Configuration.App.ReadOnlyFileColor());
-            return true;
-        }
-        return false;
+        if (file.isDirectory() && isJunction) size.setText("<JCT>");
+        if (attr.isSystem()) addStyleClass("yafx-file-attr-win-system");
+        if (attr.isReadOnly()) addStyleClass("yafx-file-attr-win-readonly");
+        if (isJunction) addStyleClass("yafx-file-attr-win-junction");
     }
 
-    private void setItemColor(String color) {
+    private void addStyleClass(String name) {
         container.getChildren()
-                .forEach(n -> n.setStyle(String.format("-fx-text-fill: %s;", color)));
+                .forEach(n -> n.getStyleClass().add(name));
+    }
+
+    private void clearStyleClass() {
+        container.getChildren().forEach(n -> n.getStyleClass().clear());
     }
 }
