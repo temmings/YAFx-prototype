@@ -10,11 +10,11 @@ import java.io.IOException;
 public class NativeUtils {
     /* http://stackoverflow.com/questions/3249117/cross-platform-way-to-detect-a-symbolic-link-junction-point/3286732 */
     interface Kernel32 extends Library {
-        public int GetFileAttributesW(WString fileName);
+        int GetFileAttributesW(WString fileName);
     }
 
-    static Kernel32 lib = null;
-    public static int getWin32FileAttributes(File f) throws IOException {
+    private static Kernel32 lib = null;
+    private static int getWin32FileAttributes(File f) throws IOException {
         if (lib == null) {
             synchronized (Kernel32.class) {
                 lib = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
@@ -24,9 +24,8 @@ public class NativeUtils {
     }
 
     public static boolean isJunctionOrSymlink(File f) throws IOException {
-        if (!f.exists()) { return false; }
+        if (!f.exists()) return false;
         int attributes = getWin32FileAttributes(f);
-        if (-1 == attributes) { return false; }
-        return ((0x400 & attributes) != 0);
+        return -1 != attributes && ((0x400 & attributes) != 0);
     }
 }

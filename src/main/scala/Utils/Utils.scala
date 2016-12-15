@@ -14,7 +14,7 @@ object Utils {
     // TODO: detect UTF-16
     // TODO: detect BOM
     val in = new FileInputStream(f)
-    val maxSize = 1024
+    val maxSize: Int = 1024
     val size = if (in.available < maxSize) in.available else maxSize
     val data = new Array[Byte](size)
     in.read(data)
@@ -23,7 +23,7 @@ object Utils {
     var ascii = 0
     var other = 0
 
-    for (i <- 0 to data.length-1) {
+    for (i <- data.indices) {
       val b = data(i)
       //println(f"$i: $b : $b%02X")
       if (0x00 <= b && b < 0x09) return true
@@ -35,6 +35,6 @@ object Utils {
 
     if (other == 0) return false
 
-    return 100 * other / (ascii + other) > 95
+    100 * other / (ascii + other) > 95
   }
 }

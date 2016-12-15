@@ -17,17 +17,17 @@ case class LocalFileSystem() {
     if (null == f.getParentFile)
       return list
 
-    return List[ListFile](ListFile(f.getParentFile, "..")) ++ list
+    List[ListFile](ListFile(f.getParentFile, "..")) ++ list
   }
   def getList(path: String): List[ListFile] = getList(new File(path))
 
-  def sortCondition(f: File) = (!f.isDirectory, f.getName)
+  private def sortCondition(f: File) = (!f.isDirectory, f.getName)
 
   // Utilities
-  def isExist(path: String) = new File(path).exists
-  def isFile(path: String) = new File(path).isFile
-  def isDirectory(path: String) = new File(path).isDirectory
+  def isExist(path: String): Boolean = new File(path).exists
+  def isFile(path: String): Boolean = new File(path).isFile
+  def isDirectory(path: String): Boolean = new File(path).isDirectory
   def canChangeDirectory(file: File): Boolean = file.isDirectory && file.canRead
   def canChangeDirectory(path: String): Boolean = canChangeDirectory(new File(path))
-  def canView(file: File) = !file.isDirectory && file.canRead
+  def canView(file: File): Boolean = !file.isDirectory && file.canRead
 }

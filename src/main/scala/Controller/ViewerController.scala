@@ -11,9 +11,9 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 case class ViewerController(viewer: TextArea) {
   viewer.onKeyPressed = onKeyPressed
   viewer.onKeyReleased = onKeyReleased
-  var sourceControl: Control = null
+  var sourceControl: Control = _
 
-  def open(sourceControl: Control, file: File) = {
+  def open(sourceControl: Control, file: File): Unit = {
     this.sourceControl = sourceControl
     val source = Source.fromFile(file, Configuration.App.ViewerDefaultCharset, Configuration.App.ViewerBufferSize)
     val lines = source.getLines
@@ -26,30 +26,29 @@ case class ViewerController(viewer: TextArea) {
     viewer.requestFocus
   }
 
-  def close = {
+  private def close() = {
     viewer.setVisible(false)
-    viewer.clear
-    println(s"focus to ${sourceControl}")
+    viewer.clear()
+    println(s"focus to $sourceControl")
     sourceControl.requestFocus
   }
 
-  def onKeyPressed(e: KeyEvent) = {
+  private def onKeyPressed(e: KeyEvent) = {
     println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
     e.code match {
       // defaults
       case KeyCode.Down | KeyCode.Up | KeyCode.Space
            | KeyCode.PageDown | KeyCode.PageUp =>
-      case _ => {
+      case _ =>
         e.consume
         e.code match {
-          case KeyCode.Enter => close
-          case KeyCode.Escape => close
+          case KeyCode.Enter => close()
+          case KeyCode.Escape => close()
           case _ =>
         }
-      }
     }
   }
-  def onKeyReleased(e: KeyEvent) = {
+  private def onKeyReleased(e: KeyEvent) = {
     println(s"Released: ${e.code} on ${e.target} from ${e.source}")
     e.consume
   }
