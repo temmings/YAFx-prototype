@@ -1,7 +1,7 @@
 package Controller
 
 import java.io.File
-import java.nio.file.Path
+import java.nio.file._
 
 import scala.sys.process.Process
 import scalafx.Includes._
@@ -10,7 +10,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import Control.{FileListCell, ListFile}
-import FileSystem.LocalFileSystem
+import _root_.FileSystem.LocalFileSystem
 import Utils.Utils
 
 case class FileListController(
@@ -99,7 +99,13 @@ case class FileListController(
     setLocation(file.getCanonicalPath)
   }
 
-  //private def copyFile(files: ObservableList[File]) = ???
+  private def copyFile(file: ListFile) = {
+    Files.copy(
+      file.toFile.toPath,
+      pairFileList.currentLocation.resolve(file.toFile.getName),
+      StandardCopyOption.COPY_ATTRIBUTES)
+    pairFileList.refresh()
+  }
 
   private def onListKeyPressed(e: KeyEvent) = {
     println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
@@ -115,7 +121,7 @@ case class FileListController(
             if (getCurrentItem.toFile.isDirectory) cd(getCurrentItem.toFile)
             else viewFile(getCurrentItem.toFile)
           case KeyCode.BackSpace => cd(currentLocation.getParent.toFile)
-          //case KeyCode.C => copyFile(list.getSelectionModel.getSelectedItems)
+          case KeyCode.C => copyFile(getCurrentItem)
           case KeyCode.E => editFile(getCurrentItem.toFile)
           case KeyCode.V => viewFile(getCurrentItem.toFile)
           case KeyCode.Q => closeApp()
