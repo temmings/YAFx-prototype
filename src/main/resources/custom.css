@@ -1,0 +1,26 @@
+/* inner file list cell */
+.yafx-file {
+    -fx-text-fill: gainsboro;
+}
+.yafx-file-attr-directory {
+    -fx-text-fill: aqua;
+}
+.yafx-file-attr-hidden {
+    -fx-text-fill: blue;
+}
+.yafx-file-attr-readonly {
+    -fx-text-fill: red;
+}
+.yafx-file-attr-win-system {
+    -fx-text-fill: darkorchid;
+}
+.yafx-file-attr-win-readonly {
+    -fx-text-fill: red;
+}
+.yafx-file-attr-win-junction {
+    -fx-text-fill: yellowgreen;
+}
+/* color of extension */
+.yafx-file-ext-zip {
+    -fx-text-fill: aqua;
+}
