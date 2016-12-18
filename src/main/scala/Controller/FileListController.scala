@@ -144,6 +144,8 @@ case class FileListController(
       // defaults
       case KeyCode.Down | KeyCode.Up
            | KeyCode.PageDown | KeyCode.PageUp =>
+        println(list.getSelectionModel.selectedItems)
+        println(list.getFocusModel.getFocusedItem)
       case _ =>
         e.consume
         e.code match {
@@ -151,7 +153,7 @@ case class FileListController(
           case KeyCode.Enter =>
             if (getCurrentItem.toFile.isDirectory) cd(getCurrentItem.toFile)
             else viewFile(getCurrentItem.toFile)
-          case KeyCode.BackSpace => cd(currentLocation.getParent.toFile)
+          case KeyCode.BackSpace => if (null != currentLocation.getParent) cd(currentLocation.getParent.toFile)
           case KeyCode.Period => toggleHiddenFiles()
           case KeyCode.C => copyFile(getCurrentItem)
           case KeyCode.E => editFile(getCurrentItem.toFile)
