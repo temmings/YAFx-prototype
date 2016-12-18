@@ -16,4 +16,5 @@ case class ListFile(file: File, name: String) {
   def modifiedTime: Date = new Date(file.lastModified)
   def modifiedTimeString: String = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(modifiedTime)
   def toFile: File = file
+  def isHidden: Boolean = file.isHidden || file.getName.startsWith(".")
 }
