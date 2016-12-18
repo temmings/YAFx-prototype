@@ -20,6 +20,7 @@ case class FileListController(
   private val fs = LocalFileSystem()
   private var pairFileList: FileListController = _
   var currentLocation: Path = _
+  var showHiddenFiles: Boolean = false
 
   location.setMouseTransparent(true)
   location.text.onChange { changeLocationHandler() }
@@ -33,6 +34,11 @@ case class FileListController(
   list.onKeyReleased = onListKeyReleased
 
   setLocation(Configuration.App.DefaultLocation)
+
+  private def listFileFilter(file: ListFile) = {
+    if (showHiddenFiles) true
+    else !file.isHidden
+  }
 
   private def changeLocationHandler() = {
     val path = location.getText
@@ -53,7 +59,7 @@ case class FileListController(
   private def undoLocation() = location.setText(currentLocation.toAbsolutePath.toString)
 
   private def getCurrentItem = list.getSelectionModel.getSelectedItem
-  private def refresh() = list.items = ObservableBuffer(fs.getList(currentLocation.toFile))
+  private def refresh() = list.items = ObservableBuffer(fs.getList(currentLocation.toFile).filter(listFileFilter))
 
   private def focusToLocation() = {
     println(s"focus to $location")
@@ -107,6 +113,11 @@ case class FileListController(
     pairFileList.refresh()
   }
 
+  private def toggleHiddenFiles() = {
+    showHiddenFiles = !showHiddenFiles
+    refresh()
+  }
+
   private def onListKeyPressed(e: KeyEvent) = {
     println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
     e.code match {
@@ -121,6 +132,7 @@ case class FileListController(
             if (getCurrentItem.toFile.isDirectory) cd(getCurrentItem.toFile)
             else viewFile(getCurrentItem.toFile)
           case KeyCode.BackSpace => cd(currentLocation.getParent.toFile)
+          case KeyCode.Period => toggleHiddenFiles()
           case KeyCode.C => copyFile(getCurrentItem)
           case KeyCode.E => editFile(getCurrentItem.toFile)
           case KeyCode.V => viewFile(getCurrentItem.toFile)
