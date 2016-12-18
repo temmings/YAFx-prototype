@@ -9,8 +9,8 @@ Yet another AFx
 
 #### Common
 
-| key  | behavior |
-|:-----|:---------|
+| key  | action |
+|:-----|:-------|
 | Tab | focus to opposite content list. |
 | BackSpace | change directory to parent. |
 | e | open the editor. |
@@ -21,28 +21,28 @@ Yet another AFx
 
 #### Cursor on Directory
 
-| key  | behavior |
-|:-----|:---------|
+| key  | action |
+|:-----|:-------|
 | Enter | change directory. |
 
 #### Cursor on File
 
-| key  | behavior |
-|:-----|:---------|
+| key  | action |
+|:-----|:-------|
 | Enter | open the content viewer. |
 
 ---
 
 ### The content viewer
 
-| key  | behavior |
-|:-----|:---------|
+| key  | action |
+|:-----|:-------|
 | Enter or Esc | close the content viewer. |
 
 ---
 
 ### The location bar
 
-| key  | behavior |
-|:-----|:---------|
+| key  | action |
+|:-----|:-------|
 | Esc  | focus to the content list. |
