@@ -1,4 +1,4 @@
-package Control
+package Model
 
 import java.io.File
 import java.text.SimpleDateFormat

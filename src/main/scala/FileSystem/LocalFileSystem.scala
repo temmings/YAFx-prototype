@@ -2,7 +2,7 @@ package FileSystem
 
 import java.io.File
 
-import Control.ListFile
+import Model.ListFile
 
 case class LocalFileSystem() {
   def getList(f: File): List[ListFile] = {
@@ -17,7 +17,7 @@ case class LocalFileSystem() {
     if (null == f.getParentFile)
       return list
 
-    List[ListFile](ListFile(f.getParentFile, "..")) ++ list
+    ListFile(f.getParentFile, "..") :: list
   }
   def getList(path: String): List[ListFile] = getList(new File(path))
 
