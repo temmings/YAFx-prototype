@@ -14,10 +14,11 @@ import Model.{ListFile, LocationHistory}
 import _root_.FileSystem.LocalFileSystem
 import Utils.Utils
 
-case class FileListController(
-                               location: TextField,
-                               list: ListView[ListFile],
-                               viewer: ViewerController) {
+class FileListController(
+                          location: TextField,
+                          list: ListView[ListFile],
+                          viewer: ViewerController,
+                          imageViewer: ImageViewController) {
   private val fs = LocalFileSystem()
   private var pairFileList: FileListController = _
   var currentLocation: Path = _
@@ -68,11 +69,10 @@ case class FileListController(
     refresh()
 
     histories.find(_.location == currentLocation) match {
-      case Some(LocationHistory(_, focus)) => {
+      case Some(LocationHistory(_, focus)) =>
         println(f"focus: $focus")
         list.getSelectionModel.select(focus)
         list.scrollTo(focus)
-      }
       case _ => list.getSelectionModel.selectFirst()
     }
   }
@@ -99,12 +99,18 @@ case class FileListController(
     Process(s"${Configuration.App.Editor} ${file.getAbsolutePath}").run
   }
 
-  private def viewFile(file: File) = {
+  private def viewText(file: File) = {
     if (fs.canView(file)) {
       val isBinary = Utils.isBinaryFile(file)
       println(s"isBinaryFile: $isBinary")
       println(s"view file: ${file.getAbsolutePath}")
       if (!isBinary) viewer.open(list, file)
+    }
+  }
+
+  private def viewImage(file: File) = {
+    if (fs.canView(file)) {
+      imageViewer.open(list, file)
     }
   }
 
@@ -138,6 +144,14 @@ case class FileListController(
     refresh()
   }
 
+  private def actionOfContext(item: ListFile) = {
+    (item.isDirectory, item.isImageFile) match {
+      case (true, _) => cd(getCurrentItem.toFile)
+      case (_, false) => viewText(getCurrentItem.toFile)
+      case (_, true) => viewImage(getCurrentItem.toFile)
+    }
+  }
+
   private def onListKeyPressed(e: KeyEvent) = {
     println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
     e.code match {
@@ -150,14 +164,12 @@ case class FileListController(
         e.consume
         e.code match {
           case KeyCode.Tab => pairFileList.focusToList()
-          case KeyCode.Enter =>
-            if (getCurrentItem.toFile.isDirectory) cd(getCurrentItem.toFile)
-            else viewFile(getCurrentItem.toFile)
+          case KeyCode.Enter => actionOfContext(getCurrentItem)
           case KeyCode.BackSpace => if (null != currentLocation.getParent) cd(currentLocation.getParent.toFile)
           case KeyCode.Period => toggleHiddenFiles()
           case KeyCode.C => copyFile(getCurrentItem)
           case KeyCode.E => editFile(getCurrentItem.toFile)
-          case KeyCode.V => viewFile(getCurrentItem.toFile)
+          case KeyCode.V => viewText(getCurrentItem.toFile)
           case KeyCode.Q => closeApp()
           case _ =>
 

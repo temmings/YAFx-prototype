@@ -1,11 +1,13 @@
-import Controller.{FileListController, ViewerController}
+import Controller._
 import Model.ListFile
 
 import scalafx.application.{JFXApp, Platform}
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
+import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{AnchorPane, HBox, VBox}
+import scalafx.scene.paint.Color
 
 
 object YAFx extends JFXApp {
@@ -42,6 +44,14 @@ object YAFx extends JFXApp {
     prefWidth = Configuration.App.DefaultWindowWidth
   }
 
+  val imageContainer = new HBox {
+    visible = false
+    style = "-fx-background-color: black"
+    prefHeight = Configuration.App.DefaultWindowHeight
+    prefWidth = Configuration.App.DefaultWindowWidth
+    alignment = Pos.Center
+  }
+
   val anchor = new AnchorPane {
     id = "mainPanel"
     prefHeight = Configuration.App.DefaultWindowHeight
@@ -67,7 +77,8 @@ object YAFx extends JFXApp {
         alignment = Pos.Center
         fillHeight = true
         children = viewer
-      }
+      },
+      imageContainer
     )
   }
 
@@ -76,9 +87,10 @@ object YAFx extends JFXApp {
     scene = new Scene(anchor)
   }
 
-  val viewerController = ViewerController(viewer)
-  val fileListController = FileListController(location, fileList, viewerController)
-  val fileListRightController = FileListController(locationRight, fileListRight, viewerController)
+  val viewerController = new ViewerController(viewer)
+  val imageViewController = new ImageViewController(imageContainer)
+  val fileListController = new FileListController(location, fileList, viewerController, imageViewController)
+  val fileListRightController = new FileListController(locationRight, fileListRight, viewerController, imageViewController)
   fileListController.setPairFileListController(fileListRightController)
   fileListRightController.setPairFileListController(fileListController)
   Platform.runLater(fileList.requestFocus)

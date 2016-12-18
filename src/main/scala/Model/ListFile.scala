@@ -17,4 +17,6 @@ case class ListFile(file: File, name: String) {
   def modifiedTimeString: String = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(modifiedTime)
   def toFile: File = file
   def isHidden: Boolean = file.isHidden || file.getName.startsWith(".")
+  def isDirectory: Boolean = file.isDirectory
+  def isImageFile: Boolean = List("bmp", "jpg", "jpeg", "png", "gif").contains(extension)
 }
