@@ -1,9 +1,9 @@
 package Controller
 
+import java.awt.Desktop
 import java.io.File
 import java.nio.file._
 
-import scala.sys.process.Process
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
@@ -96,7 +96,7 @@ class FileListController(
 
   private def editFile(file: File) = {
     println(s"edit file: ${file.getAbsolutePath}")
-    Process(s"${Configuration.App.Editor} ${file.getAbsolutePath}").run
+    Desktop.getDesktop.edit(file)
   }
 
   private def viewText(file: File) = {
