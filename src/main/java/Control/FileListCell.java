@@ -1,5 +1,6 @@
 package Control;
 
+import Model.ListFile;
 import com.sun.jna.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

@@ -9,7 +9,8 @@ import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
-import Control.{FileListCell, ListFile}
+import Control.FileListCell
+import Model.{ListFile, LocationHistory}
 import _root_.FileSystem.LocalFileSystem
 import Utils.Utils
 
@@ -20,6 +21,7 @@ case class FileListController(
   private val fs = LocalFileSystem()
   private var pairFileList: FileListController = _
   var currentLocation: Path = _
+  var histories: List[LocationHistory] = List[LocationHistory]()
   var showHiddenFiles: Boolean = false
 
   location.setMouseTransparent(true)
@@ -33,7 +35,7 @@ case class FileListController(
   list.onKeyPressed = onListKeyPressed
   list.onKeyReleased = onListKeyReleased
 
-  setLocation(Configuration.App.DefaultLocation)
+  setLocation(Paths.get(Configuration.App.DefaultLocation))
 
   private def listFileFilter(file: ListFile) = {
     if (showHiddenFiles) true
@@ -43,20 +45,38 @@ case class FileListController(
   private def changeLocationHandler() = {
     val path = location.getText
     if (fs.canChangeDirectory(path)) {
-      setLocation(path)
+      setLocation(Paths.get(path))
     }
   }
 
   def setPairFileListController(c: FileListController): Unit =
     pairFileList = c
 
-  private def setLocation(path: String) = {
-    currentLocation = new File(path).toPath
-    location.setText(path)
+  private def setLocation(path: Path): Unit = {
+    val h = if (null != currentLocation) {
+      if (currentLocation.normalize() == path.normalize()) return
+      // TODO: 適切なリスト管理にする
+      LocationHistory(currentLocation.normalize(), getCurrentItem)
+    } else {
+      LocationHistory(path.getParent, ListFile(path.toFile, path.toFile.getName))
+    }
+    println(f"add history: $h")
+    histories +:= h
+
+    currentLocation = path
+    location.setText(currentLocation.toString)
     refresh()
-    list.getSelectionModel.select(0)
+
+    histories.find(_.location == currentLocation) match {
+      case Some(LocationHistory(_, focus)) => {
+        println(f"focus: $focus")
+        list.getSelectionModel.select(focus)
+        list.scrollTo(focus)
+      }
+      case _ => list.getSelectionModel.selectFirst()
+    }
   }
-  private def undoLocation() = location.setText(currentLocation.toAbsolutePath.toString)
+  private def undoLocation() = location.setText(currentLocation.toString)
 
   private def getCurrentItem = list.getSelectionModel.getSelectedItem
   private def refresh() = list.items = ObservableBuffer(fs.getList(currentLocation.toFile).filter(listFileFilter))
@@ -102,7 +122,7 @@ case class FileListController(
 
   private def cd(file: File) = {
     println(s"change directory: ${file.getCanonicalPath}")
-    setLocation(file.getCanonicalPath)
+    setLocation(file.toPath)
   }
 
   private def copyFile(file: ListFile) = {

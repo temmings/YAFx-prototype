@@ -1,5 +1,5 @@
-import Control.ListFile
 import Controller.{FileListController, ViewerController}
+import Model.ListFile
 
 import scalafx.application.{JFXApp, Platform}
 import scalafx.geometry.Pos
