@@ -1,52 +1,71 @@
-* {
+/* location bar */
+.yafx-location-bar {
+    -fx-min-height: 25;
+    -fx-max-height: 25;
+    -fx-background-color: black;
+    -fx-text-fill: #DDDDDD;
     -fx-font-family: monospace;
 }
 
-.text-field {
-    -fx-background-color: black;
+/* content viewer */
+.yafx-content-viewer, .yafx-content-viewer .content {
     -fx-text-fill: #DDDDDD;
-}
-
-.text-area {
     -fx-background-color: black;
-    -fx-text-fill: #DDDDDD;
+    -fx-font-family: monospace;
 }
 
-.content {
+/* image viewer */
+.yafx-image-container {
     -fx-background-color: black;
-    -fx-text-fill: #DDDDDD;
+    -fx-alignment: center;
 }
 
-.list-cell {
+/* content list */
+.yafx-content-list .list-cell {
     -fx-background-color: black;
-    -fx-text-fill: white;
-    -fx-padding: 0px 2px 0px 6px;
+    -fx-padding: 0px 2px;
+    -fx-font-family: monospace;
+}
+.yafx-content-list .list-cell:even {
 }
 
-.list-cell:filled:selected {
-    /* -fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%); */
+.yafx-content-list .list-cell:filled:selected {
     -fx-background-color: purple;
 }
-
-.list-cell:even {
-    -fx-background-color: black;
-}
-
-.list-cell:filled:hover {
+.yafx-content-list .list-cell:filled:hover {
 }
 
 /* Disable scroll bar */
-.list-view .scroll-bar .increment-arrow,
-.list-view .scroll-bar .decrement-arrow,
-.list-view .scroll-bar .increment-button,
-.list-view .scroll-bar .decrement-button {
+.yafx-content-list .scroll-bar .increment-arrow,
+.yafx-content-list .scroll-bar .decrement-arrow,
+.yafx-content-list .scroll-bar .increment-button,
+.yafx-content-list .scroll-bar .decrement-button {
     -fx-padding: 0px;
 }
 
-/* inner file list cell */
-.yafx-file {
+/* inner content list cell */
+
+/* inner label */
+.yafx-content-list .yafx-item-name {
+    -fx-min-width: 10;
+}
+.yafx-content-list .yafx-item-ext {
+    -fx-min-width: 40;
+    -fx-max-width: 40;
+}
+.yafx-content-list .yafx-item-size {
+    -fx-min-width: 100;
+    -fx-max-width: 100;
+    -fx-alignment: center-right;
+}
+.yafx-content-list .yafx-item-time {
+    -fx-min-width: 130;
+    -fx-max-width: 130;
+    -fx-alignment: center-right;
+}
+.yafx-content-list .yafx-file {
     -fx-text-fill: gainsboro;
 }
-.yafx-file-attr-directory {
+.yafx-content-list .yafx-file-attr-directory {
     -fx-text-fill: aqua;
 }

@@ -21,10 +21,11 @@ class ImageViewController(container: Pane) {
     container.setVisible(true)
     container.requestFocus
     val image = new Image(file.toURI.toString)
-    val imageView = new ImageView(image)
-    imageView.setPreserveRatio(true)
-    imageView.fitHeight = container.getHeight
-    imageView.fitWidth = container.getWidth
+    val imageView = new ImageView(image) {
+      preserveRatio = true
+      fitHeight <== container.height
+      fitWidth <== container.width
+    }
     container.children.add(imageView)
   }
 

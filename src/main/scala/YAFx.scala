@@ -2,96 +2,77 @@ import Controller._
 import Model.ListFile
 
 import scalafx.application.{JFXApp, Platform}
-import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
-import scalafx.scene.image.ImageView
-import scalafx.scene.layout.{AnchorPane, HBox, VBox}
-import scalafx.scene.paint.Color
+import scalafx.scene.layout._
 
 
 object YAFx extends JFXApp {
-
-  val location = new TextField {
-    editable = true
-    prefHeight = 25.0
-    prefWidth = Configuration.App.DefaultWindowWidth / 2
-  }
-
-  val fileList = new ListView[ListFile] {
-    editable = false
-    prefHeight = Configuration.App.DefaultWindowHeight - location.getPrefHeight
-    prefWidth = Configuration.App.DefaultWindowWidth / 2
-  }
-
-  val locationRight = new TextField {
-    editable = true
-    prefHeight = 25.0
-    prefWidth = Configuration.App.DefaultWindowWidth / 2
-  }
-
-  val fileListRight = new ListView[ListFile] {
-    editable = false
-    prefHeight = Configuration.App.DefaultWindowHeight - locationRight.getPrefHeight
-    prefWidth = Configuration.App.DefaultWindowWidth / 2
-  }
-
   val viewer = new TextArea {
     editable = false
     visible = false
     wrapText = true
-    prefHeight = Configuration.App.DefaultWindowHeight
-    prefWidth = Configuration.App.DefaultWindowWidth
+    styleClass += "yafx-content-viewer"
   }
 
   val imageContainer = new HBox {
     visible = false
-    style = "-fx-background-color: black"
-    prefHeight = Configuration.App.DefaultWindowHeight
-    prefWidth = Configuration.App.DefaultWindowWidth
-    alignment = Pos.Center
+    styleClass += "yafx-image-container"
   }
 
-  val anchor = new AnchorPane {
-    id = "mainPanel"
-    prefHeight = Configuration.App.DefaultWindowHeight
-    prefWidth = Configuration.App.DefaultWindowWidth
-    stylesheets = Seq("basic.css", "custom.css")
+  val locationLeft = new TextField {
+    editable = true
+    styleClass += "yafx-location-bar"
+  }
+  val listLeft = new ListView[ListFile] {
+    editable = false
+    vgrow = Priority.Always
+    styleClass += "yafx-content-list"
+  }
+
+  val locationRight = new TextField {
+    editable = true
+    styleClass += "yafx-location-bar"
+  }
+  val listRight = new ListView[ListFile] {
+    editable = false
+    vgrow = Priority.Always
+    styleClass += "yafx-content-list"
+  }
+
+  val listContainer = new HBox {
     children = Seq(
-      new HBox {
-        alignment = Pos.Center
-        fillHeight = true
-        children = Seq(
-          new VBox {
-            alignment = Pos.Center
-            fillWidth = true
-            children = Seq(location, fileList)
-          },
-          new VBox {
-            alignment = Pos.Center
-            fillWidth = true
-            children = Seq(locationRight, fileListRight)
-          })
+      new VBox {
+        children = Seq(locationLeft, listLeft)
+        hgrow = Priority.Always
       },
-      new HBox {
-        alignment = Pos.Center
-        fillHeight = true
-        children = viewer
-      },
-      imageContainer
-    )
+      new VBox {
+        children = Seq(locationRight, listRight)
+        hgrow = Priority.Always
+      })
+  }
+
+  val pane = new StackPane {
+    stylesheets = Seq("basic.css", "custom.css")
+    children = Seq(listContainer, viewer, imageContainer)
   }
 
   stage = new JFXApp.PrimaryStage() {
     title = "YAFx"
-    scene = new Scene(anchor)
+    minHeight = 200
+    minWidth = 400
+    maxHeight = Double.PositiveInfinity
+    maxWidth = Double.PositiveInfinity
+    height = Configuration.App.DefaultWindowHeight
+    width = Configuration.App.DefaultWindowWidth
+    scene = new Scene(pane)
   }
 
   val viewerController = new ViewerController(viewer)
   val imageViewController = new ImageViewController(imageContainer)
-  val fileListController = new FileListController(location, fileList, viewerController, imageViewController)
-  val fileListRightController = new FileListController(locationRight, fileListRight, viewerController, imageViewController)
+  val fileListController = new FileListController(locationLeft, listLeft, viewerController, imageViewController)
+  val fileListRightController = new FileListController(locationRight, listRight, viewerController, imageViewController)
   fileListController.setPairFileListController(fileListRightController)
   fileListRightController.setPairFileListController(fileListController)
-  Platform.runLater(fileList.requestFocus)
+  Platform.runLater(listLeft.requestFocus)
 }
