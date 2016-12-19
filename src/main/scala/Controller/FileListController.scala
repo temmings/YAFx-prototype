@@ -11,7 +11,7 @@ import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import Control.FileListCell
 import Model.{ListFile, LocationHistory}
-import _root_.FileSystem.LocalFileSystem
+import _root_.FileSystem.{LocalFileSystem, ZipFileSystem}
 import Utils.Utils
 
 class FileListController(
@@ -59,7 +59,7 @@ class FileListController(
       // TODO: 適切なリスト管理にする
       LocationHistory(currentLocation.normalize(), getCurrentItem)
     } else {
-      LocationHistory(path.getParent, ListFile(path.toFile, path.toFile.getName))
+      LocationHistory(path.getParent, ListFile.fromFile(path.toFile, path.toFile.getName))
     }
     println(f"add history: $h")
     histories +:= h
@@ -73,13 +73,21 @@ class FileListController(
         println(f"focus: $focus")
         list.getSelectionModel.select(focus)
         list.scrollTo(focus)
-      case _ => list.getSelectionModel.selectFirst()
+      case _ =>
+        list.getSelectionModel.selectFirst()
+        list.scrollTo(0)
     }
   }
   private def undoLocation() = location.setText(currentLocation.toString)
 
   private def getCurrentItem = list.getSelectionModel.getSelectedItem
-  private def refresh() = list.items = ObservableBuffer(fs.getList(currentLocation.toFile).filter(listFileFilter))
+  private def refresh() = {
+    if (currentLocation.getFileName.toString.toLowerCase().endsWith(".zip"))
+      list.items = ObservableBuffer(ZipFileSystem(currentLocation.toFile)
+        .getList(currentLocation.toFile).filter(listFileFilter))
+    else
+      list.items = ObservableBuffer(fs.getList(currentLocation.toFile).filter(listFileFilter))
+  }
 
   private def focusToLocation() = {
     println(s"focus to $location")
@@ -145,10 +153,11 @@ class FileListController(
   }
 
   private def actionOfContext(item: ListFile) = {
-    (item.isDirectory, item.isImageFile) match {
-      case (true, _) => cd(getCurrentItem.toFile)
-      case (_, false) => viewText(getCurrentItem.toFile)
-      case (_, true) => viewImage(getCurrentItem.toFile)
+    (item.isDirectory, item.isArchive, item.isImageFile) match {
+      case (true, _, _) => cd(getCurrentItem.toFile)
+      case (_, true, _) => cd(getCurrentItem.toFile)
+      case (_, _, false) => viewText(getCurrentItem.toFile)
+      case (_, _, true) => viewImage(getCurrentItem.toFile)
     }
   }
 
@@ -162,15 +171,17 @@ class FileListController(
         println(list.getFocusModel.getFocusedItem)
       case _ =>
         e.consume
-        e.code match {
-          case KeyCode.Tab => pairFileList.focusToList()
-          case KeyCode.Enter => actionOfContext(getCurrentItem)
-          case KeyCode.BackSpace => if (null != currentLocation.getParent) cd(currentLocation.getParent.toFile)
-          case KeyCode.Period => toggleHiddenFiles()
-          case KeyCode.C => copyFile(getCurrentItem)
-          case KeyCode.E => editFile(getCurrentItem.toFile)
-          case KeyCode.V => viewText(getCurrentItem.toFile)
-          case KeyCode.Q => closeApp()
+        (e.shiftDown, e.code) match {
+          case (false, KeyCode.Tab) => pairFileList.focusToList()
+          case (false, KeyCode.Enter) => actionOfContext(getCurrentItem)
+          case (false, KeyCode.BackSpace) =>
+            if (null != currentLocation.getParent) cd(currentLocation.getParent.toFile)
+          case (false, KeyCode.Period) => toggleHiddenFiles()
+          case (false, KeyCode.C) => copyFile(getCurrentItem)
+          case (false, KeyCode.E) => editFile(getCurrentItem.toFile)
+          case (true,  KeyCode.U) => if (getCurrentItem.isArchive) cd(getCurrentItem.toFile)
+          case (false, KeyCode.V) => viewText(getCurrentItem.toFile)
+          case (false, KeyCode.Q) => closeApp()
           case _ =>
 
         }

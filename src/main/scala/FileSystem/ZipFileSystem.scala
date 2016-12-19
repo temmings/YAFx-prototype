@@ -1,23 +1,20 @@
 package FileSystem
 
-import java.io.File
+import java.io.{File, FileInputStream}
+import java.util.zip.{ZipEntry, ZipFile, ZipInputStream}
+import scala.collection.JavaConverters._
 
 import Model.ListFile
 
-case class LocalFileSystem() {
+case class ZipFileSystem(file: File) {
   def getList(f: File): List[ListFile] = {
-    if (!f.exists || !f.isDirectory)
-      return List[ListFile]()
+    if (!f.exists) return List[ListFile]()
 
-    val list = f.listFiles()
-        .sortBy(sortCondition)
-        .map(f => ListFile.fromFile(f, f.getName))
-        .toList
+    val list = new ZipFile(file).stream().iterator().asScala
+      .map(x => ListFile.fromZipFile(file, x, x.getName))
+      .toList
 
-    if (null == f.getParentFile)
-      return list
-
-    ListFile.fromFile(f.getParentFile, "..") :: list
+    ListFile.fromFile(file.getParentFile, "..") :: list
   }
   // Utilities
   def isExist(path: String): Boolean = new File(path).exists
@@ -26,6 +23,4 @@ case class LocalFileSystem() {
   def canChangeDirectory(file: File): Boolean = file.isDirectory && file.canRead
   def canChangeDirectory(path: String): Boolean = canChangeDirectory(new File(path))
   def canView(file: File): Boolean = !file.isDirectory && file.canRead
-
-  private def sortCondition(f: File) = (!f.isDirectory, f.getName)
 }
