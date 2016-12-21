@@ -12,4 +12,7 @@ libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.102-R11"
 //resolvers += Resolver.sonatypeRepo("releases")
 //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
+// https://mvnrepository.com/artifact/org.apache.commons/commons-vfs2
+libraryDependencies += "org.apache.commons" % "commons-vfs2" % "2.1"
+
 enablePlugins(JavaAppPackaging)
