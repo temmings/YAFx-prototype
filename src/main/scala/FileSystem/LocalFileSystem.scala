@@ -9,7 +9,7 @@ case class LocalFileSystem(path: Path) extends IFileSystem {
   def listFiles(relative: String): List[ListFile] = {
     val list = path.resolve(relative).toFile.listFiles()
         .sortBy(f => (!f.isDirectory, f.getName))
-        .map(f => ListFile.fromPath(this, f.toPath.getFileName))
+        .map(f => ListFile.fromPath(this, f.toPath))
         .toList
 
     Option(path.getParent) match {
