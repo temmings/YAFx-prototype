@@ -1,6 +1,8 @@
 package Utils
 
-import java.io.{File, FileInputStream}
+import java.io.InputStream
+
+import scalafx.scene.input.KeyEvent
 
 /**
   * Created by temmings on 12/11/2016.
@@ -10,15 +12,13 @@ object Utils {
     *  Guess whether given file is binary. Just checks for anything under 0x09.
     *  http://stackoverflow.com/questions/620993/determining-binary-text-file-type-in-java
     */
-  def isBinaryFile(f: File): Boolean = {
+  def isBinary(in: InputStream): Boolean = {
     // TODO: detect UTF-16
     // TODO: detect BOM
-    val in = new FileInputStream(f)
     val maxSize: Int = 1024
     val size = if (in.available < maxSize) in.available else maxSize
     val data = new Array[Byte](size)
     in.read(data)
-    in.close()
 
     var ascii = 0
     var other = 0

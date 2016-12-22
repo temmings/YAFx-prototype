@@ -1,6 +1,8 @@
 package Controller
 
-import java.io.File
+import java.io.{BufferedInputStream, File, InputStream}
+
+import Model.ListFile
 
 import scala.io.Source
 import scala.util.Properties
@@ -13,14 +15,22 @@ class ViewerController(viewer: TextArea) {
   viewer.onKeyReleased = onKeyReleased
   var sourceControl: Control = _
 
-  def open(sourceControl: Control, file: File): Unit = {
+  def open(sourceControl: Control, item: ListFile): Unit = {
     this.sourceControl = sourceControl
-    val source = Source.fromFile(file, Configuration.App.ViewerDefaultCharset, Configuration.App.ViewerBufferSize)
-    val lines = source.getLines
-    val sb = new StringBuilder
-    lines.foreach(l => sb.append(l + Properties.lineSeparator))
-    source.close
-    viewer.setText(sb.toString)
+    try {
+      if (Utils.Utils.isBinary(item.getContents)) {
+        val in = new BufferedInputStream(item.getContents)
+        val body = Stream.continually(in.read).takeWhile(_ != -1)
+          .map(_.toByte.formatted("%02X "))
+          .grouped(16)
+          .map(x => x.foldRight("\n")((n, z) => n + z))
+          .mkString
+        viewer.setText(body)
+      } else {
+        val body = Source.createBufferedSource(item.getContents).mkString
+        viewer.setText(body)
+      }
+    } finally item.getContents.close()
     viewer.setScrollTop(Double.MinValue)
     viewer.setVisible(true)
     viewer.requestFocus

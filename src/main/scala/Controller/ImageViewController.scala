@@ -2,6 +2,8 @@ package Controller
 
 import java.io.File
 
+import Model.ListFile
+
 import scalafx.Includes._
 import scalafx.scene.control.Control
 import scalafx.scene.image.{Image, ImageView}
@@ -16,11 +18,11 @@ class ImageViewController(container: Pane) {
   container.onKeyReleased = onKeyReleased
   var sourceControl: Control = _
 
-  def open(sourceControl: Control, file: File): Unit = {
+  def open(sourceControl: Control, item: ListFile): Unit = {
     this.sourceControl = sourceControl
     container.setVisible(true)
     container.requestFocus
-    val image = new Image(file.toURI.toString)
+    val image = new Image(item.toFile.toURI.toString)
     val imageView = new ImageView(image) {
       preserveRatio = true
       fitHeight <== container.height

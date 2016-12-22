@@ -29,9 +29,9 @@ public class FileListCell extends ListCell<ListFile> {
     }
 
     @Override
-    protected void updateItem(ListFile file, boolean empty) {
-        super.updateItem(file, empty);
-        if (null == file || empty) {
+    protected void updateItem(ListFile item, boolean empty) {
+        super.updateItem(item, empty);
+        if (null == item || empty) {
             setGraphic(null);
             return;
         }
@@ -44,39 +44,39 @@ public class FileListCell extends ListCell<ListFile> {
                         .subtract(time.widthProperty())
         );
         setGraphic(container);
-        if (file.hasExtension()
-                && 0 < file.nameWithoutExtension().length()
-                && file.extension().length() <= Configuration.App.SeparateExtensionMaxLength()) {
-            name.setText(file.nameWithoutExtension());
-            ext.setText('.' + file.extension());
-            ext.getStyleClass().add(String.format("yafx-file-ext-%s", file.extension()));
+        if (item.hasExtension()
+                && 0 < item.nameWithoutExtension().length()
+                && item.extension().length() <= Configuration.App.SeparateExtensionMaxLength()) {
+            name.setText(item.nameWithoutExtension());
+            ext.setText('.' + item.extension());
+            ext.getStyleClass().add(String.format("yafx-file-ext-%s", item.extension()));
         } else {
-            name.setText(file.name());
+            name.setText(item.name());
             ext.setText("");
         }
-        size.setText(file.sizeOrTypeString());
-        time.setText(file.modifiedTimeString());
+        size.setText(item.sizeOrTypeString());
+        time.setText(item.modifiedTimeString());
 
         addStyleClass("yafx-file");
-        if (file.toFile().isHidden()) addStyleClass("yafx-file-attr-hidden");
-        if (!file.toFile().canWrite()) addStyleClass("yafx-file-attr-readonly");
-        if (file.toFile().isDirectory()) addStyleClass("yafx-file-attr-directory");
+        if (item.isHidden()) addStyleClass("yafx-file-attr-hidden");
+        if (!item.toFile().canWrite()) addStyleClass("yafx-file-attr-readonly");
+        if (item.isDirectory()) addStyleClass("yafx-file-attr-directory");
 
         // Windows specific
-        if (Platform.isWindows()) setWindowsItemColor(file.toFile());
+        if (Platform.isWindows()) setWindowsItemColor(item);
     }
 
-    private void setWindowsItemColor(File file) {
+    private void setWindowsItemColor(ListFile item) {
         DosFileAttributes attr;
         Boolean isJunction;
         try {
-            attr = Files.readAttributes(file.toPath(), DosFileAttributes.class);
-            isJunction = NativeUtils.isJunctionOrSymlink(file);
+            attr = Files.readAttributes(item.path(), DosFileAttributes.class);
+            isJunction = NativeUtils.isJunctionOrSymlink(item.toFile());
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
             return;
         }
-        if (file.isDirectory() && isJunction) size.setText("<JCT>");
+        if (item.isDirectory() && isJunction) size.setText("<JCT>");
         if (attr.isSystem()) addStyleClass("yafx-file-attr-win-system");
         if (attr.isReadOnly()) addStyleClass("yafx-file-attr-win-readonly");
         if (isJunction) addStyleClass("yafx-file-attr-win-junction");

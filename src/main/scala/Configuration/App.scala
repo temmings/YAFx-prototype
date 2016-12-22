@@ -9,4 +9,6 @@ object App {
 
   val DefaultWindowHeight = 480.0
   val DefaultWindowWidth = 1024.0
+
+  val MaxDirHistories = 100
 }
