@@ -1,12 +1,15 @@
 package Model
 
-import java.io.File
+import java.io.{File, InputStream}
 import java.nio.file.{Path, Paths}
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.zip.ZipEntry
 
+import FileSystem.IFileSystem
+
 case class ListFile(
+                     fs: IFileSystem,
                      path: Path,
                      size: Long,
                      modifiedTime: Date,
@@ -26,13 +29,15 @@ case class ListFile(
   def isImageFile: Boolean = List("bmp", "jpg", "jpeg", "png", "gif").contains(extension.toLowerCase())
   def isArchive: Boolean = List("zip").contains(extension.toLowerCase())
   def toFile: File = path.toFile
+  def getContents: InputStream = fs.getContents(path.toString)
 }
 
 object ListFile {
-  def fromFile(f: File, alias: Option[String] = None): ListFile =
-    ListFile(f.toPath, f.length, new Date(f.lastModified), f.isDirectory, f.isHidden, alias)
-  def fromPath(p: Path, alias: Option[String] = None): ListFile =
-    fromFile(p.toFile, alias)
-  def fromZipFile(f: File, ze: ZipEntry, alias: Option[String] = None): ListFile =
-    ListFile(Paths.get(ze.getName), ze.getSize, new Date(ze.getTime), ze.isDirectory, isHiddenFile = false, alias)
+  def fromPath(fs: IFileSystem, p: Path, alias: Option[String] = None): ListFile = {
+    val f = p.toFile
+    ListFile(fs, p, f.length, new Date(f.lastModified), f.isDirectory, f.isHidden, alias)
+  }
+  def fromZipEntry(fs: IFileSystem, ze: ZipEntry, alias: Option[String] = None): ListFile =
+    ListFile(fs, Paths.get(ze.getName), ze.getSize, new Date(ze.getTime), ze.isDirectory,
+      isHiddenFile = false, alias)
 }

@@ -1,23 +1,22 @@
 package FileSystem
 
+import java.io.{File, FileInputStream, InputStream}
 import java.nio.file.Path
 
 import Model.ListFile
 
 case class LocalFileSystem(path: Path) extends IFileSystem {
-  private val file = path.toFile
-
-  def listFiles(): List[ListFile] = {
-    if (!file.exists || !file.isDirectory) return Nil
-
-    val list = file.listFiles()
+  def listFiles(relative: String): List[ListFile] = {
+    val list = path.resolve(relative).toFile.listFiles()
         .sortBy(f => (!f.isDirectory, f.getName))
-        .map(f => ListFile.fromFile(f))
+        .map(f => ListFile.fromPath(this, f.toPath.getFileName))
         .toList
 
     Option(path.getParent) match {
-      case Some(p) => ListFile.fromPath(p, Some("..")) :: list
       case None => list
+      case Some(p) => ListFile.fromPath(this, p, Some("..")) :: list
     }
   }
+
+  def getContents(name: String): InputStream = new FileInputStream(path.resolve(name).toFile)
 }

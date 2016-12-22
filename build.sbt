@@ -4,7 +4,7 @@ scalaVersion := "2.12.1"
 
 libraryDependencies += "com.sun.jna" % "jna" % "3.0.9"
 
-//libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.1" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.102-R11"
 //libraryDependencies += "org.scalafx" %% "scalafxml-core-sfx8" % "0.3"
 //libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
