@@ -2,8 +2,6 @@ package Utils
 
 import java.io.InputStream
 
-import scalafx.scene.input.KeyEvent
-
 /**
   * Created by temmings on 12/11/2016.
   */

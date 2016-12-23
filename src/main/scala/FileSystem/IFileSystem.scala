@@ -2,9 +2,9 @@ package FileSystem
 
 import java.io.InputStream
 
-import Model.ListFile
+import Model.FileItem
 
 trait IFileSystem {
-  def listFiles(relative: String = ""): List[ListFile]
+  def listFiles(relative: String = ""): List[FileItem]
   def getContents(name: String): InputStream
 }

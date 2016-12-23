@@ -1,8 +1,6 @@
 package Controller
 
-import java.io.File
-
-import Model.ListFile
+import Model.FileItem
 
 import scalafx.Includes._
 import scalafx.scene.control.Control
@@ -18,7 +16,7 @@ class ImageViewController(container: Pane) {
   container.onKeyReleased = onKeyReleased
   var sourceControl: Control = _
 
-  def open(sourceControl: Control, item: ListFile): Unit = {
+  def open(sourceControl: Control, item: FileItem): Unit = {
     this.sourceControl = sourceControl
     container.setVisible(true)
     container.requestFocus

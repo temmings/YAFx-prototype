@@ -3,61 +3,57 @@ package Controller
 import java.awt.Desktop
 import java.nio.file._
 
+import Control.ItemCell
+import Model._
+import _root_.FileSystem.{LocalFileSystem, ZipFileSystem}
+
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
-import Control.FileListCell
-import Model.{ListFile, LocationHistory}
-import _root_.FileSystem.{LocalFileSystem, ZipFileSystem}
 
 class FileListController(
                           location: TextField,
-                          list: ListView[ListFile],
+                          list: ListView[FormatItem],
                           viewer: ViewerController,
                           imageViewer: ImageViewController) {
   private var pairFileList: FileListController = _
-  var currentLocation: Path = _
   var histories: List[LocationHistory] = List[LocationHistory]()
   var showHiddenFiles: Boolean = false
+  var currentLocation: Item = Configuration.App.DefaultLocation
 
   location.setMouseTransparent(true)
-  //location.text.onChange { changeLocationHandler() }
   location.onKeyPressed = onLocationKeyPressed
 
   list.setMouseTransparent(true)
-  list.cellFactory = (_: ListView[ListFile]) => new ListCell[ListFile](new FileListCell())
+  list.cellFactory = (_: ListView[FormatItem]) => new ListCell[FormatItem](new ItemCell())
   list.onKeyPressed = onListKeyPressed
   list.onKeyReleased = onListKeyReleased
 
-  setLocation(Paths.get(Configuration.App.DefaultLocation))
+  setLocation(currentLocation)
 
-  private def changeLocationHandler() = {
-    val path = location.getText
-    setLocation(Paths.get(path))
-  }
+  def setPairFileListController(c: FileListController): Unit = pairFileList = c
 
-  def setPairFileListController(c: FileListController): Unit =
-    pairFileList = c
-
-  private def setLocation(path: Path): Unit = {
-    if (currentLocation == path) return
-    val history = Option(currentLocation) match {
-      case None =>
-        LocationHistory(path.getParent, ListFile.fromPath(detectFileSystem(path)(path), path))
-      case Some(current) =>
-        LocationHistory(current.normalize(), getCurrentItem)
-    }
+  private def appendHistory(item: FormatItem) = {
+    val history = LocationHistory(currentLocation.id, item)
     // TODO: 適切なリスト管理にする
     histories = (history :: histories.filterNot(history.==)).take(Configuration.App.MaxDirHistories)
     println(f"add history: $history")
+  }
 
-    currentLocation = path.normalize()
-    location.setText(path.normalize().toString)
+  private def getHistory(item: Item) = {
+    histories.find(_.location == item.id)
+  }
+
+  private def setLocation(item: Item): Unit = {
+    getCurrentItem.foreach(appendHistory)
+
+    currentLocation = item
+    location.setText(item.id)
     refresh()
 
-    histories.find(_.location == currentLocation) match {
+    getHistory(currentLocation) match {
       case Some(LocationHistory(_, focus)) =>
         println(f"focus: $focus")
         list.getSelectionModel.select(focus)
@@ -67,21 +63,21 @@ class FileListController(
         list.scrollTo(0)
     }
   }
-  private def undoLocation() = location.setText(currentLocation.toString)
+  private def undoLocation() = location.setText(currentLocation.id)
 
-  private def detectFileSystem(path: Path) = {
-    val filename = Option(path.getFileName).getOrElse("").toString
+  private def detectFileSystem(item: Item) = {
+    val filename = Option(Paths.get(item.id).getFileName).getOrElse("").toString
     filename.toLowerCase.split('.').last match {
       case "zip" => ZipFileSystem
       case _ => LocalFileSystem
     }
   }
 
-  private def getCurrentItem = list.getSelectionModel.getSelectedItem
+  private def getCurrentItem = Option(list.getSelectionModel.getSelectedItem)
   private def refresh() = {
     val fs = detectFileSystem(currentLocation)
-    def filter(file: ListFile) = showHiddenFiles || !file.isHidden
-    val items = fs(currentLocation).listFiles().filter(filter)
+    def filter(item: FileItem) = showHiddenFiles || !item.isHidden
+    val items = fs(Paths.get(currentLocation.id)).listFiles().filter(filter)
     list.items = ObservableBuffer(items)
   }
 
@@ -99,17 +95,17 @@ class FileListController(
     System.exit(0)
   }
 
-  private def editFile(item: ListFile) = {
+  private def editFile(item: FileItem) = {
     println(s"editFile($item)")
     Desktop.getDesktop.edit(item.toFile)
   }
 
-  private def viewText(item: ListFile) = {
+  private def viewText(item: FileItem) = {
     println(s"viewText:($item)")
     viewer.open(list, item)
   }
 
-  private def viewImage(item: ListFile) = {
+  private def viewImage(item: FileItem) = {
     imageViewer.open(list, item)
   }
 
@@ -125,15 +121,15 @@ class FileListController(
     }
   }
 
-  private def cd(path: Path) = {
-    println(f"cd:($path)")
-    setLocation(path)
+  private def cd(item: Item) = {
+    println(f"cd:($item)")
+    setLocation(item)
   }
 
-  private def copyFile(file: ListFile) = {
+  private def copyFile(item: FileItem) = {
     Files.copy(
-      file.path,
-      pairFileList.currentLocation.resolve(file.toFile.getName),
+      item.toPath,
+      Paths.get(pairFileList.currentLocation.id).resolve(item.toFile.getName),
       StandardCopyOption.COPY_ATTRIBUTES)
     pairFileList.refresh()
   }
@@ -143,12 +139,12 @@ class FileListController(
     refresh()
   }
 
-  private def actionOfContext(item: ListFile) = {
-    (item.isDirectory, item.isArchive, item.isImageFile) match {
-      case (true, _, _) => cd(getCurrentItem.path)
-      case (_, true, _) => cd(getCurrentItem.path)
-      case (_, _, false) => viewText(getCurrentItem)
-      case (_, _, true) => viewImage(getCurrentItem)
+  private def actionOfContext(item: FileItem) = {
+    (item.hasChildren, item.isImage) match {
+      case (true, _) => getCurrentItem.map(_.toItem).foreach(cd)
+      case (_, true) => getCurrentItem.map(_.toFileItem).foreach(viewImage)
+      case (_, false) => getCurrentItem.map(_.toFileItem).foreach(viewText)
+      case _ =>
     }
   }
 
@@ -162,14 +158,14 @@ class FileListController(
         e.consume
         (e.shiftDown, e.code) match {
           case (false, KeyCode.Tab) => pairFileList.focusToList()
-          case (false, KeyCode.Enter) => actionOfContext(getCurrentItem)
-          case (false, KeyCode.BackSpace) => Option(currentLocation.getParent).foreach(p => cd(p))
+          case (false, KeyCode.Enter) => getCurrentItem.map(_.toFileItem).foreach(actionOfContext)
+          case (false, KeyCode.BackSpace) => currentLocation.getParent.foreach(cd)
           case (false, KeyCode.Period) => toggleHiddenFiles()
-          case (false, KeyCode.BackSlash) => cd(currentLocation.getRoot)
-          case (false, KeyCode.C) => copyFile(getCurrentItem)
-          case (false, KeyCode.E) => editFile(getCurrentItem)
-          case (true,  KeyCode.U) => if (getCurrentItem.isArchive) cd(getCurrentItem.path)
-          case (false, KeyCode.V) => viewText(getCurrentItem)
+          case (false, KeyCode.BackSlash) => currentLocation.getRoot.foreach(cd)
+          case (false, KeyCode.C) => getCurrentItem.map(_.toFileItem).foreach(copyFile)
+          case (false, KeyCode.E) => getCurrentItem.map(_.toFileItem).foreach(editFile)
+          case (true,  KeyCode.U) => getCurrentItem.map(_.toFileItem).filter(_.isArchive).foreach(cd)
+          case (false, KeyCode.V) => getCurrentItem.map(_.toFileItem).foreach(viewText)
           case (false, KeyCode.Q) => closeApp()
           case _ =>
 

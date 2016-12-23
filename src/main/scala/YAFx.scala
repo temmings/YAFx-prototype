@@ -1,5 +1,5 @@
 import Controller._
-import Model.ListFile
+import Model.FormatItem
 
 import scalafx.application.{JFXApp, Platform}
 import scalafx.scene.Scene
@@ -24,7 +24,7 @@ object YAFx extends JFXApp {
     editable = true
     styleClass += "yafx-location-bar"
   }
-  val listLeft = new ListView[ListFile] {
+  val listLeft = new ListView[FormatItem] {
     editable = false
     vgrow = Priority.Always
     styleClass += "yafx-content-list"
@@ -34,7 +34,7 @@ object YAFx extends JFXApp {
     editable = true
     styleClass += "yafx-location-bar"
   }
-  val listRight = new ListView[ListFile] {
+  val listRight = new ListView[FormatItem] {
     editable = false
     vgrow = Priority.Always
     styleClass += "yafx-content-list"

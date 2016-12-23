@@ -63,9 +63,9 @@
     -fx-max-width: 130;
     -fx-alignment: center-right;
 }
-.yafx-content-list .yafx-file {
+.yafx-content-list .yafx-item-file {
     -fx-text-fill: gainsboro;
 }
-.yafx-content-list .yafx-file-attr-directory {
+.yafx-content-list .yafx-item-directory {
     -fx-text-fill: aqua;
 }

@@ -4,16 +4,16 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.util.zip.ZipFile
 
-import Model.ListFile
+import Model.FileItem
 
 import scala.collection.JavaConverters._
 
 case class ZipFileSystem(path: Path) extends IFileSystem {
-  def listFiles(relative: String): List[ListFile] = {
+  def listFiles(relative: String): List[FileItem] = {
     val zip = new ZipFile(path.toFile)
     val entries = zip.stream().iterator().asScala
-    val list = entries.map(x => ListFile.fromZipEntry(this, x)).toList
-    ListFile.fromPath(this, path.getParent, Some("..")) :: list
+    val list = entries.map(x => FileItem.fromZipEntry(x)).toList
+    FileItem(path.getParent.toFile, Some("..")) :: list
   }
 
   def getContents(name: String): InputStream = {

@@ -1,11 +1,10 @@
 package Controller
 
-import java.io.{BufferedInputStream, File, InputStream}
+import java.io.BufferedInputStream
 
-import Model.ListFile
+import Model.FileItem
 
 import scala.io.Source
-import scala.util.Properties
 import scalafx.Includes._
 import scalafx.scene.control.{Control, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
@@ -15,7 +14,7 @@ class ViewerController(viewer: TextArea) {
   viewer.onKeyReleased = onKeyReleased
   var sourceControl: Control = _
 
-  def open(sourceControl: Control, item: ListFile): Unit = {
+  def open(sourceControl: Control, item: FileItem): Unit = {
     this.sourceControl = sourceControl
     try {
       if (Utils.Utils.isBinary(item.getContents)) {
