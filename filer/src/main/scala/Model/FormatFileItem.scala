@@ -36,6 +36,9 @@ trait FormatFileItem extends FormatItem {
     }
   }
   private def getSplitExt: Option[String] = {
-    if (ext.length <= splitExtLength && ext.length < name.length-1) Some(ext) else None
+    if (0 < ext.length && ext.length <= splitExtLength && ext.length < name.length - 1)
+      Some(ext)
+    else
+      None
   }
 }
