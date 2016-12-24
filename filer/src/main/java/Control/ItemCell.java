@@ -2,17 +2,18 @@ package Control;
 
 import Model.FormatItem;
 import Utils.ItemCellUtil;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+
+import java.util.List;
 
 /**
  * see also: http://blog.livedoor.jp/fukai_yas/archives/47274295.html
  */
 public class ItemCell extends ListCell<FormatItem> {
-    private final HBox container = new HBox(0.0);
+    private final BorderPane container = new BorderPane();
 
     @Override
     protected void updateItem(FormatItem item, boolean empty) {
@@ -23,14 +24,25 @@ public class ItemCell extends ListCell<FormatItem> {
             setGraphic(null);
             return;
         }
-
-        container.getChildren().addAll(ItemCellUtil.getLabels(item));
-        Label head = (Label)container.getChildren().get(0);
-        HBox.setHgrow(head, Priority.ALWAYS);
-        ReadOnlyDoubleProperty headSize = container.widthProperty();
-        container.getChildren().stream().filter(x -> x != head)
-                .forEach(x -> headSize.subtract(((Label)x).widthProperty()));
-        head.maxWidthProperty().bind(headSize);
         setGraphic(container);
+
+        List<Label> labels = ItemCellUtil.getLabels(item);
+        Label head = labels.get(0);
+        container.setLeft(head);
+
+        HBox hbox = new HBox(0.0);
+        labels.subList(1, labels.size()).forEach(x -> hbox.getChildren().add(x));
+        container.setRight(hbox);
+
+        // TODO: bind hbox label size
+        head.maxWidthProperty().bind(container.widthProperty().subtract(270));
+
+        //container.getChildren().addAll(ItemCellUtil.getLabels(item));
+        //Label head = (Label)container.getChildren().get(0);
+        //HBox.setHgrow(head, Priority.ALWAYS);
+        //ReadOnlyDoubleProperty headSize = container.widthProperty();
+        //container.getChildren().stream().filter(x -> x != head)
+        //        .forEach(x -> headSize.subtract(((Label)x).widthProperty()));
+        //head.maxWidthProperty().bind(headSize);
     }
 }
