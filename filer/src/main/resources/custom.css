@@ -21,9 +21,25 @@
     -fx-text-fill: yellowgreen;
 }
 /* color of extension */
+.yafx-content-list .yafx-item-ext-bz2,
+.yafx-content-list .yafx-item-ext-gz,
+.yafx-content-list .yafx-item-ext-jar,
+.yafx-content-list .yafx-item-ext-tar,
+.yafx-content-list .yafx-item-ext-tgz,
+.yafx-content-list .yafx-item-ext-tbz,
 .yafx-content-list .yafx-item-ext-zip {
     -fx-text-fill: aqua;
 }
-.yafx-content-list .yafx-item-ext-jpg {
+
+.yafx-content-list .yafx-item-ext-bmp,
+.yafx-content-list .yafx-item-ext-gif,
+.yafx-content-list .yafx-item-ext-jpg,
+.yafx-content-list .yafx-item-ext-jpeg,
+.yafx-content-list .yafx-item-ext-png {
     -fx-text-fill: darkorchid;
+}
+
+.yafx-content-list .yafx-item-ext-exe,
+.yafx-content-list .yafx-item-ext-com {
+    -fx-text-fill: yellow;
 }

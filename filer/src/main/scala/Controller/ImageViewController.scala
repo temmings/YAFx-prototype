@@ -1,6 +1,7 @@
 package Controller
 
 import Model.FileItem
+import resource._
 
 import scalafx.Includes._
 import scalafx.scene.control.Control
@@ -17,13 +18,15 @@ class ImageViewController(container: Pane) {
     this.sourceControl = sourceControl
     container.setVisible(true)
     container.requestFocus
-    val image = new Image(item.getContents.getInputStream)
-    val imageView = new ImageView(image) {
-      preserveRatio = true
-      fitHeight <== container.height
-      fitWidth <== container.width
+    for (input <- managed(item.getContents.getInputStream)) {
+      val image = new Image(input)
+      val imageView = new ImageView(image) {
+        preserveRatio = true
+        fitHeight <== container.height
+        fitWidth <== container.width
+      }
+      container.children.add(imageView)
     }
-    container.children.add(imageView)
   }
 
   private def close() = {

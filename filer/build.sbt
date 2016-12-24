@@ -9,7 +9,8 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-compress" % "1.9",
   //"commons-io" % "commons-io" % "2.5"
   // https://mvnrepository.com/artifact/com.googlecode.juniversalchardet/juniversalchardet
-  "com.googlecode.juniversalchardet" % "juniversalchardet" % "1.0.3"
+  "com.googlecode.juniversalchardet" % "juniversalchardet" % "1.0.3",
+  "com.jsuereth" %% "scala-arm" % "2.0"
 )
 
 enablePlugins(JavaAppPackaging)

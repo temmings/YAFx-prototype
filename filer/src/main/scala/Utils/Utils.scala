@@ -39,17 +39,21 @@ object Utils {
   }
 
   def detectCharset(in: InputStream): Option[String] = {
-    val detector = new UniversalDetector(null)
-    val buf = new Array[Byte](2048)
-    var n = 0
-    do {
-      n = in.read(buf)
-      detector.handleData(buf, 0, n)
-    } while (0 < n && !detector.isDone)
-    detector.dataEnd()
-    val charset = Option(detector.getDetectedCharset)
-    detector.reset()
+    try {
+      val detector = new UniversalDetector(null)
+      val buf = new Array[Byte](4096)
+      var n = 0
+      do {
+        n = in.read(buf)
+        detector.handleData(buf, 0, n)
+      } while (0 < n && !detector.isDone)
+      detector.dataEnd()
+      val charset = Option(detector.getDetectedCharset)
+      detector.reset()
 
-    charset
+      charset
+    } catch {
+      case e: Exception => None
+    }
   }
 }

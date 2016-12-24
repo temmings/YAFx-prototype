@@ -4,6 +4,7 @@ import java.io.BufferedInputStream
 import java.nio.charset.Charset
 
 import Model.FileItem
+import resource._
 
 import scalafx.Includes._
 import scalafx.scene.control.{Control, TextArea}
@@ -16,27 +17,37 @@ class TextViewerController(viewer: TextArea) {
 
   def open(sourceControl: Control, item: FileItem): Unit = {
     this.sourceControl = sourceControl
-    try {
-      val in = new BufferedInputStream(item.getContents.getInputStream)
-      if (Utils.Utils.isBinary(item.getContents.getInputStream)) {
-        val body = Stream.continually(in.read).takeWhile(_ != -1)
-          .map(_.toByte.formatted("%02X "))
-          .grouped(16)
-          .map(x => x.foldRight("\n")((n, z) => n + z))
-          .mkString
-        viewer.setText(body)
-      } else {
-        val encode = Utils.Utils.detectCharset(in) match {
-          case Some(charset) => Charset.forName(charset)
-          case None => Charset.defaultCharset()
-        }
-        val body = new String(Stream.continually(in.read).takeWhile(_ != -1).map(_.toByte).toArray, encode)
-        viewer.setText(body)
+    val isBinary = {
+      var flag = false
+      for (in <- managed(item.getContents.getInputStream))
+        flag = Utils.Utils.isBinary(in)
+      flag
+    }
+    val encode = {
+      var e: Charset = null
+      for (in <- managed(item.getContents.getInputStream)) {
+        e = Utils.Utils.detectCharset(in)
+          .map(Charset.forName)
+          .getOrElse(Charset.defaultCharset())
       }
-    } finally item.getContents.close()
+      e
+    }
+    println(s"isBinary: $isBinary, encode: $encode")
     viewer.setScrollTop(Double.MinValue)
     viewer.setVisible(true)
     viewer.requestFocus
+    for (input <- managed(new BufferedInputStream(item.getContents.getInputStream))) {
+      val byteStream = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
+      if (isBinary) {
+        val body = byteStream
+          .map(_.formatted("%02X "))
+          .grouped(16)
+          .map(x => x.foldRight("\n")(_ + _))
+          .foreach(viewer.appendText)
+      } else {
+        viewer.appendText(new String(byteStream.toArray, encode))
+      }
+    }
   }
 
   private def close() = {
