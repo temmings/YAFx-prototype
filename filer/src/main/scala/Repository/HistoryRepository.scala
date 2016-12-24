@@ -9,7 +9,6 @@ class HistoryRepository extends Repository[History] {
     histories.find(_.id == id)
   }
 
-
   def create(value: History): Unit = {
     println(f"create $value")
     histories = histories.filter(_.id != value.id)

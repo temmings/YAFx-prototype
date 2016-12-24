@@ -1,10 +1,8 @@
 package Model
 
-import java.io.File
 import java.text.SimpleDateFormat
 
 trait FormatFileItem extends FormatItem {
-  val file: File
   val splitExtLength: Int
   val name: String
   val ext: String
@@ -29,10 +27,10 @@ trait FormatFileItem extends FormatItem {
     result
   }
 
-  private def getSizeOrType = if (file.isDirectory) "<DIR>" else size.toString
+  private def getSizeOrType = if (isDirectory) "<DIR>" else size.toString
   private def getModifiedAtString = new SimpleDateFormat("yy/MM/dd HH:mm:ss").format(modifiedAt)
   private def getSplitName = {
-    (file.isDirectory, getSplitExt) match {
+    (isDirectory, getSplitExt) match {
       case (false, Some(x)) => name.dropRight(1 + x.length)
       case _ => name
     }

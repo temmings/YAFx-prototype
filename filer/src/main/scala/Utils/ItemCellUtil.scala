@@ -1,9 +1,10 @@
 package Utils
 
-import scala.collection.JavaConverters._
 import javafx.scene.control.Label
 
 import Model.FormatItem
+
+import scala.collection.JavaConverters._
 
 object ItemCellUtil {
   def getLabels(item: FormatItem): java.util.List[Label] = {

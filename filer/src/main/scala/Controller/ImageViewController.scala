@@ -1,43 +1,34 @@
 package Controller
 
-import java.io.BufferedInputStream
-
 import Model.FileItem
 
-import scala.io.Source
 import scalafx.Includes._
-import scalafx.scene.control.{Control, TextArea}
+import scalafx.scene.control.Control
+import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.layout.Pane
 
-class TextViewerController(viewer: TextArea) {
-  viewer.onKeyPressed = onKeyPressed
-  viewer.onKeyReleased = onKeyReleased
+class ImageViewController(container: Pane) {
+  container.onKeyPressed = onKeyPressed
+  container.onKeyReleased = onKeyReleased
   var sourceControl: Control = _
 
   def open(sourceControl: Control, item: FileItem): Unit = {
     this.sourceControl = sourceControl
-    try {
-      if (Utils.Utils.isBinary(item.getContents)) {
-        val in = new BufferedInputStream(item.getContents)
-        val body = Stream.continually(in.read).takeWhile(_ != -1)
-          .map(_.toByte.formatted("%02X "))
-          .grouped(16)
-          .map(x => x.foldRight("\n")((n, z) => n + z))
-          .mkString
-        viewer.setText(body)
-      } else {
-        val body = Source.createBufferedSource(item.getContents).mkString
-        viewer.setText(body)
-      }
-    } finally item.getContents.close()
-    viewer.setScrollTop(Double.MinValue)
-    viewer.setVisible(true)
-    viewer.requestFocus
+    container.setVisible(true)
+    container.requestFocus
+    val image = new Image(item.getContents.getInputStream)
+    val imageView = new ImageView(image) {
+      preserveRatio = true
+      fitHeight <== container.height
+      fitWidth <== container.width
+    }
+    container.children.add(imageView)
   }
 
   private def close() = {
-    viewer.setVisible(false)
-    viewer.clear()
+    container.setVisible(false)
+    container.children.clear()
     println(s"focus to $sourceControl")
     sourceControl.requestFocus
   }

@@ -2,6 +2,8 @@ package Utils
 
 import java.io.InputStream
 
+import org.mozilla.universalchardet.UniversalDetector
+
 /**
   * Created by temmings on 12/11/2016.
   */
@@ -34,5 +36,20 @@ object Utils {
     if (other == 0) return false
 
     100 * other / (ascii + other) > 95
+  }
+
+  def detectCharset(in: InputStream): Option[String] = {
+    val detector = new UniversalDetector(null)
+    val buf = new Array[Byte](2048)
+    var n = 0
+    do {
+      n = in.read(buf)
+      detector.handleData(buf, 0, n)
+    } while (0 < n && !detector.isDone)
+    detector.dataEnd()
+    val charset = Option(detector.getDetectedCharset)
+    detector.reset()
+
+    charset
   }
 }

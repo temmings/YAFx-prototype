@@ -1,13 +1,13 @@
 package Controller
 
 import java.awt.Desktop
-import java.nio.file._
+import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import Control.ItemCell
 import Entity.{History, HistoryId}
+import FileSystem.FileSystem
 import Model._
 import Repository.HistoryRepository
-import _root_.FileSystem.{LocalFileSystem, ZipFileSystem}
 
 import scalafx.Includes._
 import scalafx.application.Platform
@@ -22,7 +22,7 @@ class ListController(
                       imageViewer: ImageViewController) {
   private var pairFileList: ListController = _
   var showHiddenFiles: Boolean = false
-  var currentLocation: Item = Configuration.App.DefaultLocation
+  var currentLocation: Item = FileItem.fromURIString(Configuration.App.DefaultLocation)
   val histories = new HistoryRepository
 
   location.setMouseTransparent(true)
@@ -58,20 +58,12 @@ class ListController(
   }
   private def undoLocation() = location.setText(currentLocation.id)
 
-  private def detectFileSystem(item: Item) = {
-    val filename = Option(Paths.get(item.id).getFileName).getOrElse("").toString
-    filename.toLowerCase.split('.').last match {
-      case "zip" => ZipFileSystem
-      case _ => LocalFileSystem
-    }
-  }
-
   private def getCurrentItem = Option(list.getSelectionModel.getSelectedItem)
   private def refresh() = {
-    val fs = detectFileSystem(currentLocation)
     def filter(item: FileItem) = showHiddenFiles || !item.isHidden
-    val items = fs(Paths.get(currentLocation.id)).listFiles().filter(filter)
-    list.items = ObservableBuffer(items)
+
+    val items = FileSystem(currentLocation.id).listFiles()
+    list.items = ObservableBuffer(items.filter(filter).map(_.toFormatItem))
   }
 
   private def focusToLocationBar() = {
@@ -123,7 +115,7 @@ class ListController(
   private def copyFile(item: FileItem) = {
     Files.copy(
       item.toPath,
-      Paths.get(pairFileList.currentLocation.id).resolve(item.toFile.getName),
+      Paths.get(pairFileList.currentLocation.id).resolve(item.getBaseName),
       StandardCopyOption.COPY_ATTRIBUTES)
     pairFileList.refresh()
   }
@@ -158,7 +150,7 @@ class ListController(
           case (false, KeyCode.BackSlash) => currentLocation.getRoot.foreach(cd)
           case (false, KeyCode.C) => getCurrentItem.map(_.toFileItem).foreach(copyFile)
           case (false, KeyCode.E) => getCurrentItem.map(_.toFileItem).foreach(editFile)
-          case (true,  KeyCode.U) => getCurrentItem.map(_.toFileItem).filter(_.isArchive).foreach(cd)
+          case (true, KeyCode.U) => getCurrentItem.map(_.toFileItem).filter(_.hasChildren).foreach(cd)
           case (false, KeyCode.V) => getCurrentItem.map(_.toFileItem).foreach(viewText)
           case (false, KeyCode.Q) => closeApp()
           case _ =>
