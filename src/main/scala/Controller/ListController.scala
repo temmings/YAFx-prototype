@@ -4,7 +4,9 @@ import java.awt.Desktop
 import java.nio.file._
 
 import Control.ItemCell
+import Entity.{History, HistoryId}
 import Model._
+import Repository.HistoryRepository
 import _root_.FileSystem.{LocalFileSystem, ZipFileSystem}
 
 import scalafx.Includes._
@@ -13,15 +15,15 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, TextField}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
-class FileListController(
-                          location: TextField,
-                          list: ListView[FormatItem],
-                          viewer: ViewerController,
-                          imageViewer: ImageViewController) {
-  private var pairFileList: FileListController = _
-  var histories: List[LocationHistory] = List[LocationHistory]()
+class ListController(
+                      location: TextField,
+                      list: ListView[FormatItem],
+                      viewer: TextViewerController,
+                      imageViewer: ImageViewController) {
+  private var pairFileList: ListController = _
   var showHiddenFiles: Boolean = false
   var currentLocation: Item = Configuration.App.DefaultLocation
+  val histories = new HistoryRepository
 
   location.setMouseTransparent(true)
   location.onKeyPressed = onLocationKeyPressed
@@ -33,28 +35,19 @@ class FileListController(
 
   setLocation(currentLocation)
 
-  def setPairFileListController(c: FileListController): Unit = pairFileList = c
-
-  private def appendHistory(item: FormatItem) = {
-    val history = LocationHistory(currentLocation.id, item)
-    // TODO: 適切なリスト管理にする
-    histories = (history :: histories.filterNot(history.==)).take(Configuration.App.MaxDirHistories)
-    println(f"add history: $history")
-  }
-
-  private def getHistory(item: Item) = {
-    histories.find(_.location == item.id)
-  }
+  def setPairFileListController(c: ListController): Unit = pairFileList = c
 
   private def setLocation(item: Item): Unit = {
-    getCurrentItem.foreach(appendHistory)
+    getCurrentItem.foreach(x => {
+      histories.create(History(HistoryId(currentLocation.id), x))
+    })
 
     currentLocation = item
     location.setText(item.id)
     refresh()
 
-    getHistory(currentLocation) match {
-      case Some(LocationHistory(_, focus)) =>
+    histories.resolve(HistoryId(currentLocation.id)) match {
+      case Some(History(_, focus)) =>
         println(f"focus: $focus")
         list.getSelectionModel.select(focus)
         list.scrollTo(focus)
@@ -81,7 +74,7 @@ class FileListController(
     list.items = ObservableBuffer(items)
   }
 
-  private def focusToLocation() = {
+  private def focusToLocationBar() = {
     println(s"focus to $location")
     location.requestFocus
   }
@@ -106,6 +99,7 @@ class FileListController(
   }
 
   private def viewImage(item: FileItem) = {
+    println(s"viewImage:($item)")
     imageViewer.open(list, item)
   }
 
@@ -176,7 +170,7 @@ class FileListController(
     println(s"Released: ${e.code} on ${e.target} from ${e.source}")
     e.consume
     e.code match {
-      //case KeyCode.Comma => focusToLocation()
+      //case KeyCode.Comma => focusToLocationBar()
       case _ =>
     }
   }

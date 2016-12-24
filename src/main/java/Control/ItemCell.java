@@ -17,13 +17,14 @@ public class ItemCell extends ListCell<FormatItem> {
     @Override
     protected void updateItem(FormatItem item, boolean empty) {
         super.updateItem(item, empty);
+        container.getChildren().clear();
+
         if (null == item || empty) {
             setGraphic(null);
             return;
         }
 
-        container.getChildren().clear();
-        ItemCellUtil.append(container, item);
+        container.getChildren().addAll(ItemCellUtil.getLabels(item));
         Label head = (Label)container.getChildren().get(0);
         HBox.setHgrow(head, Priority.ALWAYS);
         ReadOnlyDoubleProperty headSize = container.widthProperty();

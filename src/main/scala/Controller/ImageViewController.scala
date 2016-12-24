@@ -8,9 +8,6 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.Pane
 
-/**
-  * Created by temmings on 12/19/16.
-  */
 class ImageViewController(container: Pane) {
   container.onKeyPressed = onKeyPressed
   container.onKeyReleased = onKeyReleased

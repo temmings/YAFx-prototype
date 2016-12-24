@@ -5,9 +5,10 @@ import java.io.File
 trait FileItemAttribute {
   val file: File
   val ext: String
+  val alias: Option[String]
 
   val isDirectory: Boolean = file.isDirectory
-  val isHidden: Boolean = file.isHidden || file.getName.startsWith(".")
+  val isHidden: Boolean = (file.isHidden || file.getName.startsWith(".")) && alias.getOrElse("") != ".."
   val isReadOnly: Boolean = !file.canWrite
   val isImage: Boolean = List("bmp", "jpg", "jpeg", "png", "gif").contains(ext.toLowerCase())
   val isArchive: Boolean = List("zip", "jar").contains(ext.toLowerCase())

@@ -7,14 +7,14 @@ import Model.FileItem
 
 case class LocalFileSystem(path: Path) extends IFileSystem {
   def listFiles(relative: String): List[FileItem] = {
-    val list = path.toFile.listFiles().toList
+    val parent = Option(path.getParent).map(x => FileItem(x.toFile, Some("..")))
+
+    val files = path.toFile.listFiles()
+    if (null == files) return parent.toList
+
+    parent.toList ++ files.toList
       .sortBy(f => (!f.isDirectory, f.getName))
       .map(f => FileItem(f))
-
-    Option(path.getParent) match {
-      case None => list
-      case Some(p) => FileItem(p.toFile, Some("..")) :: list
-    }
   }
 
   def getContents(name: String): InputStream = new FileInputStream(path.resolve(name).toFile)

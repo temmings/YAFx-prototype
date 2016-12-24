@@ -9,7 +9,7 @@ import scalafx.Includes._
 import scalafx.scene.control.{Control, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
-class ViewerController(viewer: TextArea) {
+class TextViewerController(viewer: TextArea) {
   viewer.onKeyPressed = onKeyPressed
   viewer.onKeyReleased = onKeyReleased
   var sourceControl: Control = _

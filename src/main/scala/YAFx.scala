@@ -68,10 +68,10 @@ object YAFx extends JFXApp {
     scene = new Scene(pane)
   }
 
-  val viewerController = new ViewerController(viewer)
+  val viewerController = new TextViewerController(viewer)
   val imageViewController = new ImageViewController(imageContainer)
-  val fileListController = new FileListController(locationLeft, listLeft, viewerController, imageViewController)
-  val fileListRightController = new FileListController(locationRight, listRight, viewerController, imageViewController)
+  val fileListController = new ListController(locationLeft, listLeft, viewerController, imageViewController)
+  val fileListRightController = new ListController(locationRight, listRight, viewerController, imageViewController)
   fileListController.setPairFileListController(fileListRightController)
   fileListRightController.setPairFileListController(fileListController)
   Platform.runLater(listLeft.requestFocus)
