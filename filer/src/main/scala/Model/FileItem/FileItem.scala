@@ -1,9 +1,10 @@
-package Model
+package Model.FileItem
 
 import java.io.File
 import java.net.URI
 import java.nio.file.{Path, Paths}
 
+import Model.{Item, UniqueItem}
 import org.apache.commons.vfs2.{FileContent, FileObject, FileSystemException}
 
 case class FileItem(

@@ -6,6 +6,7 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 import Control.ItemCell
 import Entity.{History, HistoryId}
 import FileSystem.{FileSystem, FileSystemUtil}
+import Model.FileItem.FileItem
 import Model._
 import Repository.HistoryRepository
 

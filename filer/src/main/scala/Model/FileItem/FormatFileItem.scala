@@ -1,6 +1,8 @@
-package Model
+package Model.FileItem
 
 import java.text.SimpleDateFormat
+
+import Model.FormatItem
 
 trait FormatFileItem extends FormatItem {
   self: FileItem =>

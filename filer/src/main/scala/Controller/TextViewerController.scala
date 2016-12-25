@@ -3,7 +3,7 @@ package Controller
 import java.io.BufferedInputStream
 import java.nio.charset.Charset
 
-import Model.FileItem
+import Model.FileItem.FileItem
 import org.apache.commons.vfs2.FileContent
 import resource._
 

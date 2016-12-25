@@ -1,6 +1,6 @@
 package FileSystem
 
-import Model.FileItem
+import Model.FileItem.FileItem
 import org.apache.commons.vfs2.VFS
 
 object FileSystemUtil {

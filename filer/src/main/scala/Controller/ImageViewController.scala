@@ -1,6 +1,6 @@
 package Controller
 
-import Model.FileItem
+import Model.FileItem.FileItem
 import resource._
 
 import scalafx.Includes._

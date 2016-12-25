@@ -1,4 +1,4 @@
-package Model
+package Model.FileItem
 
 import java.io.File
 import java.nio.file.attribute.DosFileAttributes

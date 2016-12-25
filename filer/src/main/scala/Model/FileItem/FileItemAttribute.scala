@@ -1,4 +1,4 @@
-package Model
+package Model.FileItem
 
 trait FileItemAttribute {
   self: FileItem =>

@@ -1,6 +1,6 @@
 package FileSystem
 
-import Model.FileItem
+import Model.FileItem.FileItem
 
 trait IFileSystem {
   def listFiles(): List[FileItem]
