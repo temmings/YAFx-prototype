@@ -45,7 +45,7 @@ object Utils {
       var n = 0
       do {
         n = in.read(buf)
-        detector.handleData(buf, 0, n)
+        if (0 < n) detector.handleData(buf, 0, n)
       } while (0 < n && !detector.isDone)
       detector.dataEnd()
       val charset = Option(detector.getDetectedCharset)
