@@ -69,6 +69,7 @@ class ListController(
   private def focusToLocationBar() = {
     println(s"focus to $location")
     location.requestFocus
+    location.deselect()
   }
   private def focusToList() = {
     println(s"focus to $list")
@@ -95,20 +96,8 @@ class ListController(
     imageViewer.open(list, item)
   }
 
-  private def onLocationKeyPressed(e: KeyEvent) = {
-    println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
-    e.code match {
-      case KeyCode.Escape =>
-        e.consume
-        undoLocation()
-        focusToList()
-      case KeyCode.Tab => e.consume
-      case _ =>
-    }
-  }
-
   private def cd(item: Item) = {
-    println(f"cd:($item)")
+    println(s"cd:($item)")
     setLocation(item)
   }
 
@@ -162,7 +151,24 @@ class ListController(
     println(s"Released: ${e.code} on ${e.target} from ${e.source}")
     e.consume
     e.code match {
-      //case KeyCode.Comma => focusToLocationBar()
+      case KeyCode.Comma => focusToLocationBar()
+      case _ =>
+    }
+  }
+
+  private def onLocationKeyPressed(e: KeyEvent) = {
+    println(s"Pressed: ${e.code} on ${e.target} from ${e.source}")
+    e.code match {
+      case KeyCode.Escape =>
+        e.consume
+        undoLocation()
+        focusToList()
+      case KeyCode.Enter =>
+        e.consume
+        setLocation(FileItem.fromURIString(location.getText))
+        focusToList()
+      case KeyCode.Tab =>
+        e.consume
       case _ =>
     }
   }
