@@ -10,9 +10,10 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.Pane
 
 class ImageViewController(container: Pane) {
+  private var sourceControl: Control = _
+
   container.onKeyPressed = onKeyPressed
   container.onKeyReleased = onKeyReleased
-  var sourceControl: Control = _
 
   def open(sourceControl: Control, item: FileItem): Unit = {
     this.sourceControl = sourceControl

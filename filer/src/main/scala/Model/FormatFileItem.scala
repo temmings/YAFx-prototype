@@ -3,14 +3,7 @@ package Model
 import java.text.SimpleDateFormat
 
 trait FormatFileItem extends FormatItem {
-  val splitExtLength: Int
-  val name: String
-  val ext: String
-  val size: Long
-  val modifiedAt: Long
-  val isDirectory: Boolean
-  val isHidden: Boolean
-  val isReadOnly: Boolean
+  self: FileItem =>
 
   override def getColumns: List[(Value, List[Style])] = List(
     (getSplitName, List("yafx-item-name")),
@@ -36,7 +29,7 @@ trait FormatFileItem extends FormatItem {
     }
   }
   private def getSplitExt: Option[String] = {
-    if (0 < ext.length && ext.length <= splitExtLength && ext.length < name.length - 1)
+    if (0 < ext.length && ext.length <= SeparateExtensionMaxLength && ext.length < name.length - 1)
       Some(ext)
     else
       None

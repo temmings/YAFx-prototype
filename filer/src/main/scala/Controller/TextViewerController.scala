@@ -12,13 +12,14 @@ import scalafx.scene.control.{Control, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
 class TextViewerController(viewer: TextArea) {
+  private var sourceControl: Control = _
+  private var currentItem: FileItem = _
+  private var charset = Configuration.App.ViewerDefaultCharset
+  private var isBinary = false
+  private var isTextMode = true
+
   viewer.onKeyPressed = onKeyPressed
   viewer.onKeyReleased = onKeyReleased
-  var sourceControl: Control = _
-  var currentItem: FileItem = _
-  var charset: Charset = Charset.defaultCharset()
-  var isBinary = false
-  var isTextMode = true
 
   def open(source: Control, item: FileItem): Unit = {
     sourceControl = source

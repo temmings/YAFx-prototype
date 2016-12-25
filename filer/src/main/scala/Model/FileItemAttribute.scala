@@ -1,11 +1,7 @@
 package Model
 
-import org.apache.commons.vfs2.FileObject
-
 trait FileItemAttribute {
-  val file: FileObject
-  val ext: String
-  val alias: Option[String]
+  self: FileItem =>
 
   val isDirectory: Boolean = file.isFolder
   val isHidden: Boolean = (file.isHidden || file.getName.getBaseName.startsWith(".")) && alias.getOrElse("") != ".."

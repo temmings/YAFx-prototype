@@ -4,9 +4,12 @@ import java.io.File
 import java.net.URI
 import java.nio.file.{Path, Paths}
 
-import org.apache.commons.vfs2.{FileContent, FileObject, FileSystemException, VFS}
+import org.apache.commons.vfs2.{FileContent, FileObject, FileSystemException}
 
-case class FileItem(file: FileObject, alias: Option[String] = None, splitExtLength: Int = 4)
+case class FileItem(
+                     file: FileObject,
+                     alias: Option[String] = None,
+                     SeparateExtensionMaxLength: Int = Configuration.App.SeparateExtensionMaxLength)
   extends {
     val id: String = file.getName.getURI
     val name: String = alias.getOrElse(file.getName.getBaseName)
@@ -15,7 +18,7 @@ case class FileItem(file: FileObject, alias: Option[String] = None, splitExtLeng
     val modifiedAt: Long = try file.getContent.getLastModifiedTime catch {
       case e: FileSystemException => println(e); 0
     }
-  } with Item with FormatFileItem with FileItemAttribute {
+  } with Item with UniqueItem with FileItemAttribute with FormatFileItem {
 
   override def hasChildren: Boolean = isDirectory || isVirtualDirectory
 
@@ -32,12 +35,4 @@ case class FileItem(file: FileObject, alias: Option[String] = None, splitExtLeng
   def toPath: Path = Paths.get(file.getName.getPath)
 
   def toURI: URI = new URI(file.getName.getURI)
-
-  def toFormatItem: FormatItem = this.asInstanceOf[FormatItem]
-}
-
-object FileItem {
-  private val vfs = VFS.getManager
-
-  def fromURIString(path: String): FileItem = FileItem(vfs.resolveFile(path))
 }

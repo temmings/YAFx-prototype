@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import Control.ItemCell
 import Entity.{History, HistoryId}
-import FileSystem.FileSystem
+import FileSystem.{FileSystem, FileSystemUtil}
 import Model._
 import Repository.HistoryRepository
 
@@ -20,10 +20,10 @@ class ListController(
                       list: ListView[FormatItem],
                       viewer: TextViewerController,
                       imageViewer: ImageViewController) {
+  var currentLocation: Item = FileSystemUtil.getFile(Configuration.App.DefaultLocation)
   private var pairFileList: ListController = _
-  var showHiddenFiles: Boolean = false
-  var currentLocation: Item = FileItem.fromURIString(Configuration.App.DefaultLocation)
-  val histories = new HistoryRepository
+  private var showHiddenFiles: Boolean = false
+  private val histories = new HistoryRepository
 
   location.setMouseTransparent(true)
   location.onKeyPressed = onLocationKeyPressed
@@ -63,7 +63,7 @@ class ListController(
     def filter(item: FileItem) = showHiddenFiles || !item.isHidden
 
     val items = FileSystem(currentLocation.id).listFiles()
-    list.items = ObservableBuffer(items.filter(filter).map(_.toFormatItem))
+    list.items = ObservableBuffer(items.filter(filter))
   }
 
   private def focusToLocationBar() = {
@@ -114,12 +114,15 @@ class ListController(
     refresh()
   }
 
-  private def actionOfContext(item: FileItem) = {
-    (item.hasChildren, item.isImage) match {
-      case (true, _) => getCurrentItem.map(_.toItem).foreach(cd)
-      case (_, true) => getCurrentItem.map(_.toFileItem).foreach(viewImage)
-      case (_, false) => getCurrentItem.map(_.toFileItem).foreach(viewText)
-      case _ =>
+  private def actionOfContext(item: Item) = {
+    if (item.hasChildren)
+      getCurrentItem.foreach(cd)
+    else item match {
+      case x: FileItem =>
+        if (x.isImage)
+          viewImage(x)
+        else
+          viewText(x)
     }
   }
 
@@ -133,17 +136,22 @@ class ListController(
         e.consume
         (e.shiftDown, e.code) match {
           case (false, KeyCode.Tab) => pairFileList.focusToList()
-          case (false, KeyCode.Enter) => getCurrentItem.map(_.toFileItem).foreach(actionOfContext)
+          case (false, KeyCode.Enter) => getCurrentItem.foreach(actionOfContext)
           case (false, KeyCode.BackSpace) => currentLocation.getParent.foreach(cd)
           case (false, KeyCode.Period) => toggleHiddenFiles()
           case (false, KeyCode.BackSlash) => currentLocation.getRoot.foreach(cd)
-          case (false, KeyCode.C) => getCurrentItem.map(_.toFileItem).foreach(copyFile)
-          case (false, KeyCode.E) => getCurrentItem.map(_.toFileItem).foreach(editFile)
-          case (true, KeyCode.U) => getCurrentItem.map(_.toFileItem).filter(_.hasChildren).foreach(cd)
-          case (false, KeyCode.V) => getCurrentItem.map(_.toFileItem).foreach(viewText)
+          case (false, KeyCode.C) => getCurrentItem.foreach {
+            case x: FileItem => copyFile(x)
+          }
+          case (false, KeyCode.E) => getCurrentItem.foreach {
+            case x: FileItem => editFile(x)
+          }
+          case (true, KeyCode.U) => getCurrentItem.filter(_.hasChildren).foreach(cd)
+          case (false, KeyCode.V) => getCurrentItem.foreach {
+            case x: FileItem => viewText(x)
+          }
           case (false, KeyCode.Q) => closeApp()
           case _ =>
-
         }
     }
   }
@@ -165,7 +173,7 @@ class ListController(
         focusToList()
       case KeyCode.Enter =>
         e.consume
-        setLocation(FileItem.fromURIString(location.getText))
+        setLocation(FileSystemUtil.getFile(location.getText))
         focusToList()
       case KeyCode.Tab =>
         e.consume

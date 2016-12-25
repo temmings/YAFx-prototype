@@ -5,12 +5,11 @@ import java.nio.file.attribute.DosFileAttributes
 import java.nio.file.{Files, Paths}
 
 import Utils.NativeUtils
-import org.apache.commons.vfs2.FileObject
 
 trait WindowsFileItemAttribute extends FileItemAttribute {
-  private val attr = Files.readAttributes(Paths.get(file.getName.getPath), classOf[DosFileAttributes])
+  self: FileItem =>
 
-  val file: FileObject
+  private val attr = Files.readAttributes(Paths.get(file.getName.getPath), classOf[DosFileAttributes])
   override val isReadOnly: Boolean = attr.isReadOnly
   val isSystem: Boolean = attr.isSystem
   val isJunctionOrSymlink: Boolean = NativeUtils.isJunctionOrSymlink(new File(file.getName.getPath))
