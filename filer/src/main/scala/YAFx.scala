@@ -1,3 +1,4 @@
+import Configuration.Default
 import Controller._
 import Model.FormatItem
 
@@ -63,8 +64,8 @@ object YAFx extends JFXApp {
     minWidth = 400
     maxHeight = Double.PositiveInfinity
     maxWidth = Double.PositiveInfinity
-    height = Configuration.App.DefaultWindowHeight
-    width = Configuration.App.DefaultWindowWidth
+    height = Default.WindowHeight
+    width = Configuration.Default.WindowWidth
     scene = new Scene(pane)
   }
 

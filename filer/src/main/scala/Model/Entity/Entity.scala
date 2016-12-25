@@ -1,4 +1,4 @@
-package Entity
+package Model.Entity
 
 trait Entity {
   type ID

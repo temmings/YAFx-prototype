@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.attribute.DosFileAttributes
 import java.nio.file.{Files, Paths}
 
-import Utils.NativeUtils
+import Util.Win32Util
 
 trait WindowsFileItemAttribute extends FileItemAttribute {
   self: FileItem =>
@@ -12,7 +12,7 @@ trait WindowsFileItemAttribute extends FileItemAttribute {
   private val attr = Files.readAttributes(Paths.get(file.getName.getPath), classOf[DosFileAttributes])
   override val isReadOnly: Boolean = attr.isReadOnly
   val isSystem: Boolean = attr.isSystem
-  val isJunctionOrSymlink: Boolean = NativeUtils.isJunctionOrSymlink(new File(file.getName.getPath))
+  val isJunctionOrSymlink: Boolean = Win32Util.isJunctionOrSymlink(new File(file.getName.getPath))
 
 
   //if (file.isDirectory() && isJunction) size.setText("<JCT>");

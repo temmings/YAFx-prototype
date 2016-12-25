@@ -4,13 +4,14 @@ import java.io.File
 import java.net.URI
 import java.nio.file.{Path, Paths}
 
+import Configuration.Default
 import Model.{Item, UniqueItem}
 import org.apache.commons.vfs2.{FileContent, FileObject, FileSystemException}
 
 case class FileItem(
                      file: FileObject,
                      alias: Option[String] = None,
-                     SeparateExtensionMaxLength: Int = Configuration.App.SeparateExtensionMaxLength)
+                     SeparateExtensionMaxLength: Int = Default.SeparateExtensionMaxLength)
   extends {
     val id: String = file.getName.getURI
     val name: String = alias.getOrElse(file.getName.getBaseName)

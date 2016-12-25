@@ -1,4 +1,4 @@
-package Entity
+package Model.Entity
 
 import Model.FormatItem
 

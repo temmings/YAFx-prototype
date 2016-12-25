@@ -1,4 +1,4 @@
-package Utils;
+package Util;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -7,7 +7,7 @@ import com.sun.jna.WString;
 import java.io.File;
 import java.io.IOException;
 
-public class NativeUtils {
+public class Win32Util {
     /* http://stackoverflow.com/questions/3249117/cross-platform-way-to-detect-a-symbolic-link-junction-point/3286732 */
     interface Kernel32 extends Library {
         int GetFileAttributesW(WString fileName);

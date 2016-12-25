@@ -1,11 +1,12 @@
-package FileSystem
+package Model.FileSystem
 
+import Configuration.Default
 import Model.FileItem.FileItem
 import org.apache.commons.vfs2.{FileNotFolderException, VFS}
 
 case class FileSystem(path: String) extends IFileSystem {
   private val vfs = VFS.getManager
-  private val scheme = Configuration.App.SupportArchiveExtensions.flatMap(x =>
+  private val scheme = Default.SupportArchiveExtensions.flatMap(x =>
     if (path.toLowerCase.endsWith(f".$x")) Some(f"$x:") else None).headOption.getOrElse("")
   private val file = vfs.resolveFile(scheme + path)
 

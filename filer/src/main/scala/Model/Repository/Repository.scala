@@ -1,6 +1,6 @@
-package Repository
+package Model.Repository
 
-import Entity.Entity
+import Model.Entity.Entity
 
 trait Repository[E <: Entity] {
   def resolve(id: E#ID): Option[E]

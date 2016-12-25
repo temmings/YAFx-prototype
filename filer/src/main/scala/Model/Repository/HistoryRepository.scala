@@ -1,6 +1,7 @@
-package Repository
+package Model.Repository
 
-import Entity.{History, HistoryId}
+import Configuration.Default
+import Model.Entity.{History, HistoryId}
 
 class HistoryRepository extends Repository[History] {
   var histories: List[History] = Nil
@@ -12,7 +13,7 @@ class HistoryRepository extends Repository[History] {
   def create(value: History): Unit = {
     println(f"create $value")
     histories = histories.filter(_.id != value.id)
-    histories = value :: histories.take(Configuration.App.MaxDirHistories)
+    histories = value :: histories.take(Default.MaxDirHistories)
     println(histories)
   }
 }

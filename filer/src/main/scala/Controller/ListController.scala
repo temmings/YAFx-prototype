@@ -4,11 +4,12 @@ import java.awt.Desktop
 import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import Control.ItemCell
-import Entity.{History, HistoryId}
-import FileSystem.{FileSystem, FileSystemUtil}
+import Model.Entity.{History, HistoryId}
 import Model.FileItem.FileItem
+import Model.FileSystem.FileSystem
+import Model.Repository.HistoryRepository
 import Model._
-import Repository.HistoryRepository
+import Util.FileUtil
 
 import scalafx.Includes._
 import scalafx.application.Platform
@@ -21,7 +22,7 @@ class ListController(
                       list: ListView[FormatItem],
                       viewer: TextViewerController,
                       imageViewer: ImageViewController) {
-  var currentLocation: Item = FileSystemUtil.getFile(Configuration.App.DefaultLocation)
+  var currentLocation: Item = FileUtil.getFile(Configuration.Default.Location)
   private var pairFileList: ListController = _
   private var showHiddenFiles: Boolean = false
   private val histories = new HistoryRepository
@@ -174,7 +175,7 @@ class ListController(
         focusToList()
       case KeyCode.Enter =>
         e.consume
-        setLocation(FileSystemUtil.getFile(location.getText))
+        setLocation(FileUtil.getFile(location.getText))
         focusToList()
       case KeyCode.Tab =>
         e.consume

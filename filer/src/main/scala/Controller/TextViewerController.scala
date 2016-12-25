@@ -3,6 +3,7 @@ package Controller
 import java.io.BufferedInputStream
 import java.nio.charset.Charset
 
+import Configuration.Default
 import Model.FileItem.FileItem
 import org.apache.commons.vfs2.FileContent
 import resource._
@@ -14,7 +15,7 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 class TextViewerController(viewer: TextArea) {
   private var sourceControl: Control = _
   private var currentItem: FileItem = _
-  private var charset = Configuration.App.ViewerDefaultCharset
+  private var charset = Default.ViewerCharset
   private var isBinary = false
   private var isTextMode = true
 
@@ -36,9 +37,9 @@ class TextViewerController(viewer: TextArea) {
 
   private def detect(file: FileContent) = {
     for (in <- managed(file.getInputStream))
-      isBinary = Utils.Utils.isBinary(in)
+      isBinary = Util.Utils.isBinary(in)
     for (in <- managed(file.getInputStream)) {
-      charset = Utils.Utils.detectCharset(in)
+      charset = Util.Utils.detectCharset(in)
         .map(Charset.forName)
         .getOrElse(Charset.defaultCharset())
     }

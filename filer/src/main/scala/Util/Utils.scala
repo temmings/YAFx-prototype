@@ -1,12 +1,9 @@
-package Utils
+package Util
 
 import java.io.InputStream
 
 import org.mozilla.universalchardet.UniversalDetector
 
-/**
-  * Created by temmings on 12/11/2016.
-  */
 object Utils {
   /**
     *  Guess whether given file is binary. Just checks for anything under 0x09.
@@ -53,7 +50,7 @@ object Utils {
 
       charset
     } catch {
-      case e: Exception => None
+      case e: Exception => println(e); None
     }
   }
 }
