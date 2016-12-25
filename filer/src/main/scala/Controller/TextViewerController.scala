@@ -4,6 +4,7 @@ import java.io.BufferedInputStream
 import java.nio.charset.Charset
 
 import Model.FileItem
+import org.apache.commons.vfs2.FileContent
 import resource._
 
 import scalafx.Includes._
@@ -14,39 +15,57 @@ class TextViewerController(viewer: TextArea) {
   viewer.onKeyPressed = onKeyPressed
   viewer.onKeyReleased = onKeyReleased
   var sourceControl: Control = _
+  var currentItem: FileItem = _
+  var charset: Charset = Charset.defaultCharset()
+  var isBinary = false
+  var isTextMode = true
 
-  def open(sourceControl: Control, item: FileItem): Unit = {
-    this.sourceControl = sourceControl
-    val isBinary = {
-      var flag = false
-      for (in <- managed(item.getContents.getInputStream))
-        flag = Utils.Utils.isBinary(in)
-      flag
-    }
-    val encode = {
-      var e: Charset = null
-      for (in <- managed(item.getContents.getInputStream)) {
-        e = Utils.Utils.detectCharset(in)
-          .map(Charset.forName)
-          .getOrElse(Charset.defaultCharset())
-      }
-      e
-    }
-    println(s"isBinary: $isBinary, encode: $encode")
-    viewer.setScrollTop(Double.MinValue)
+  def open(source: Control, item: FileItem): Unit = {
+    sourceControl = source
+    currentItem = item
+
     viewer.setVisible(true)
     viewer.requestFocus
-    for (input <- managed(new BufferedInputStream(item.getContents.getInputStream))) {
+
+    detect(item.getContents)
+    println(s"isBinary: $isBinary, charset: $charset")
+    isTextMode = !isBinary
+    show()
+  }
+
+  private def detect(file: FileContent) = {
+    for (in <- managed(file.getInputStream))
+      isBinary = Utils.Utils.isBinary(in)
+    for (in <- managed(file.getInputStream)) {
+      charset = Utils.Utils.detectCharset(in)
+        .map(Charset.forName)
+        .getOrElse(Charset.defaultCharset())
+    }
+  }
+
+  private def show() = {
+    if (isTextMode)
+      showTextString()
+    else
+      showHexString()
+  }
+
+  private def showTextString() = {
+    for (input <- managed(new BufferedInputStream(currentItem.getContents.getInputStream))) {
       val byteStream = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
-      if (isBinary) {
-        val body = byteStream
-          .map(_.formatted("%02X "))
+      viewer.setText(new String(byteStream.toArray, charset))
+    }
+  }
+
+  private def showHexString() = {
+    for (input <- managed(new BufferedInputStream(currentItem.getContents.getInputStream))) {
+      val s = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
+      viewer.setText(
+        s.map(_.formatted("%02X "))
           .grouped(16)
           .map(x => x.foldRight("\n")(_ + _))
-          .foreach(viewer.appendText)
-      } else {
-        viewer.appendText(new String(byteStream.toArray, encode))
-      }
+          .mkString
+      )
     }
   }
 
@@ -66,6 +85,9 @@ class TextViewerController(viewer: TextArea) {
       case _ =>
         e.consume
         e.code match {
+          case KeyCode.Tab =>
+            isTextMode = !isTextMode
+            show()
           case KeyCode.Enter => close()
           case KeyCode.Escape => close()
           case _ =>
