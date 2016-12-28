@@ -12,14 +12,13 @@ import resource._
 import scala.io.{Codec, Source}
 import scala.util.control.Breaks
 import scalafx.Includes._
-import scalafx.beans.property.ObjectProperty
 import scalafx.concurrent._
 import scalafx.scene.control.{Control, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
 class TextViewerController(viewer: TextArea) {
   private var sourceControl: Control = _
-  private val currentItem = new ObjectProperty[FileItem](this, "currentItem")
+  private var currentItem: FileItem = _
   private var charset = Default.ViewerCharset
   private var isBinary = false
   private var isTextMode = true
@@ -31,7 +30,7 @@ class TextViewerController(viewer: TextArea) {
 
   def open(source: Control, item: FileItem): Unit = {
     sourceControl = source
-    currentItem.value = item
+    currentItem = item
 
     viewer.setVisible(true)
     viewer.requestFocus
@@ -70,7 +69,7 @@ class TextViewerController(viewer: TextArea) {
         updateTitle("read text")
         updateMessage("Loading...")
         val source = Source.fromInputStream(
-          currentItem.value.file.getContent.getInputStream)(Codec.charset2codec(charset))
+          currentItem.file.getContent.getInputStream)(Codec.charset2codec(charset))
         val sb = new StringBuilder()
         val b = new Breaks
         b.breakable {
@@ -90,14 +89,14 @@ class TextViewerController(viewer: TextArea) {
       protected def call(): Unit = {
         updateTitle("read hex")
         updateMessage("Loading...")
-        for (input <- managed(new BufferedInputStream(currentItem.value.file.getContent.getInputStream))) {
+        for (input <- managed(new BufferedInputStream(currentItem.file.getContent.getInputStream))) {
           val s = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
           val sb = new StringBuilder()
           val b = new Breaks
           b.breakable {
             for (g <- s.grouped(16)) {
               if (isCancelled) b.break()
-              sb.append(g.map("%02X".format(_)).mkString(" "))
+              sb.append(g.map(_.formatted("%02X")).mkString(" "))
               sb.append("\n")
               updateMessage(sb.toString)
             }
@@ -108,12 +107,10 @@ class TextViewerController(viewer: TextArea) {
   })
 
   private def close() = {
-    viewer.text.unbind()
     if (isTextMode)
       readTextService.cancel()
     else
       readHexService.cancel()
-    System.gc()
     viewer.setVisible(false)
     println(s"focus to $sourceControl")
     sourceControl.requestFocus
@@ -133,7 +130,6 @@ class TextViewerController(viewer: TextArea) {
               readTextService.cancel()
             else
               readHexService.cancel()
-            viewer.text.unbind()
             isTextMode = !isTextMode
             show()
           case KeyCode.Enter => close()
