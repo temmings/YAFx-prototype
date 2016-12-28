@@ -1,32 +1,37 @@
 package Controller
 
-import java.io.{BufferedInputStream, InputStream}
+import java.io.BufferedInputStream
 import java.nio.charset.Charset
 import javafx.{concurrent => jfxc}
 
 import Configuration.Default
 import Model.FileItem.FileItem
-import org.apache.commons.vfs2.{FileContent, FileObject}
+import org.apache.commons.vfs2.FileContent
 import resource._
 
+import scala.io.{Codec, Source}
+import scala.util.control.Breaks
 import scalafx.Includes._
+import scalafx.beans.property.ObjectProperty
 import scalafx.concurrent._
 import scalafx.scene.control.{Control, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
 class TextViewerController(viewer: TextArea) {
   private var sourceControl: Control = _
-  private var currentItem: FileItem = _
+  private val currentItem = new ObjectProperty[FileItem](this, "currentItem")
   private var charset = Default.ViewerCharset
   private var isBinary = false
   private var isTextMode = true
+  private val readTextService = new ReadTextService()
+  private val readHexService = new ReadHexService()
 
   viewer.onKeyPressed = onKeyPressed
   viewer.onKeyReleased = onKeyReleased
 
   def open(source: Control, item: FileItem): Unit = {
     sourceControl = source
-    currentItem = item
+    currentItem.value = item
 
     viewer.setVisible(true)
     viewer.requestFocus
@@ -34,7 +39,7 @@ class TextViewerController(viewer: TextArea) {
     detect(item.getContents)
     println(s"isBinary: $isBinary, charset: $charset")
     isTextMode = !isBinary
-    show(currentItem.file)
+    show()
   }
 
   private def detect(file: FileContent) = {
@@ -47,50 +52,69 @@ class TextViewerController(viewer: TextArea) {
     }
   }
 
-  private def show(file: FileObject) = {
-    val task =
+  private def show() = {
+    val service =
       if (isTextMode)
-        new ReadTextTask(file.getContent.getInputStream)
+        readTextService
       else
-        new ReadHexTask(file.getContent.getInputStream)
-    viewer.text <== task.message
-    // FIXME: タスク止める方法を提供する
-    new Thread(task).start()
+        readHexService
+    service.reset()
+    service.start()
+    viewer.text <== service.message
   }
 
-  //noinspection ConvertExpressionToSAM
-  class ReadTextTask(input: InputStream) extends Task(new jfxc.Task[Unit] {
-    protected def call(): Unit = {
-      updateMessage("Loading...")
-      for (input <- managed(new BufferedInputStream(input))) {
-        val byteStream = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
-        updateMessage(new String(byteStream.toArray, charset))
+  class ReadTextService extends Service(new jfxc.Service[Unit] {
+    //noinspection ConvertExpressionToSAM
+    protected def createTask(): jfxc.Task[Unit] = new jfxc.Task[Unit] {
+      protected def call(): Unit = {
+        updateTitle("read text")
+        updateMessage("Loading...")
+        val source = Source.fromInputStream(
+          currentItem.value.file.getContent.getInputStream)(Codec.charset2codec(charset))
+        val sb = new StringBuilder()
+        val b = new Breaks
+        b.breakable {
+          for (line <- source.getLines) {
+            if (isCancelled) b.break()
+            sb.append(f"$line\n")
+            updateMessage(sb.toString)
+          }
+        }
       }
     }
   })
 
-  //noinspection ConvertExpressionToSAM
-  // FIXME: メモリ食いすぎなのでエコな実装にする
-  class ReadHexTask(input: InputStream) extends Task(new jfxc.Task[Unit] {
-    protected def call(): Unit = {
-      updateMessage("Loading...")
-      for (input <- managed(new BufferedInputStream(input))) {
-        val s = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
-        val sb = new StringBuilder()
-        s.map(_.formatted("%02X "))
-          .grouped(16)
-          .map(x => x.foldRight("\n")(_ + _))
-          .foreach(s => {
-            sb.append(s)
-            updateMessage(sb.toString)
-          })
+  class ReadHexService extends Service(new jfxc.Service[Unit] {
+    //noinspection ConvertExpressionToSAM
+    protected def createTask(): jfxc.Task[Unit] = new jfxc.Task[Unit] {
+      protected def call(): Unit = {
+        updateTitle("read hex")
+        updateMessage("Loading...")
+        for (input <- managed(new BufferedInputStream(currentItem.value.file.getContent.getInputStream))) {
+          val s = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
+          val sb = new StringBuilder()
+          val b = new Breaks
+          b.breakable {
+            for (g <- s.grouped(16)) {
+              if (isCancelled) b.break()
+              sb.append(g.map("%02X".format(_)).mkString(" "))
+              sb.append("\n")
+              updateMessage(sb.toString)
+            }
+          }
+        }
       }
     }
   })
 
   private def close() = {
+    viewer.text.unbind()
+    if (isTextMode)
+      readTextService.cancel()
+    else
+      readHexService.cancel()
+    System.gc()
     viewer.setVisible(false)
-    viewer.clear()
     println(s"focus to $sourceControl")
     sourceControl.requestFocus
   }
@@ -105,8 +129,13 @@ class TextViewerController(viewer: TextArea) {
         e.consume
         e.code match {
           case KeyCode.Tab =>
+            if (isTextMode)
+              readTextService.cancel()
+            else
+              readHexService.cancel()
+            viewer.text.unbind()
             isTextMode = !isTextMode
-            show(currentItem.file)
+            show()
           case KeyCode.Enter => close()
           case KeyCode.Escape => close()
           case _ =>
