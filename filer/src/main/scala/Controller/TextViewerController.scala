@@ -57,51 +57,58 @@ class TextViewerController(viewer: TextArea) {
         readTextService
       else
         readHexService
-    service.reset()
-    service.start()
-    viewer.text <== service.message
+    service.restart()
+    viewer.text <== service.value
   }
 
-  class ReadTextService extends Service(new jfxc.Service[Unit] {
+  class ReadTextService extends Service(new jfxc.Service[String] {
     //noinspection ConvertExpressionToSAM
-    protected def createTask(): jfxc.Task[Unit] = new jfxc.Task[Unit] {
-      protected def call(): Unit = {
+    protected def createTask(): jfxc.Task[String] = new jfxc.Task[String] {
+      val sb = new StringBuilder()
+      val b = new Breaks
+
+      protected def call(): String = {
         updateTitle("read text")
         updateMessage("Loading...")
+        sb.clear()
         val source = Source.fromInputStream(
           currentItem.file.getContent.getInputStream)(Codec.charset2codec(charset))
-        val sb = new StringBuilder()
-        val b = new Breaks
         b.breakable {
           for (line <- source.getLines) {
             if (isCancelled) b.break()
             sb.append(f"$line\n")
-            updateMessage(sb.toString)
+            updateValue(sb.toString)
           }
         }
+        updateMessage("Done.")
+        sb.toString()
       }
     }
   })
 
-  class ReadHexService extends Service(new jfxc.Service[Unit] {
+  class ReadHexService extends Service(new jfxc.Service[String] {
     //noinspection ConvertExpressionToSAM
-    protected def createTask(): jfxc.Task[Unit] = new jfxc.Task[Unit] {
-      protected def call(): Unit = {
+    protected def createTask(): jfxc.Task[String] = new jfxc.Task[String] {
+      val sb = new StringBuilder()
+      val b = new Breaks
+
+      protected def call(): String = {
         updateTitle("read hex")
         updateMessage("Loading...")
+        sb.clear()
         for (input <- managed(new BufferedInputStream(currentItem.file.getContent.getInputStream))) {
           val s = Stream.continually(input.read).takeWhile(_ != -1).map(_.toByte)
-          val sb = new StringBuilder()
-          val b = new Breaks
           b.breakable {
             for (g <- s.grouped(16)) {
               if (isCancelled) b.break()
               sb.append(g.map(_.formatted("%02X")).mkString(" "))
               sb.append("\n")
-              updateMessage(sb.toString)
+              updateValue(sb.toString)
             }
           }
         }
+        updateMessage("Done.")
+        sb.toString()
       }
     }
   })
