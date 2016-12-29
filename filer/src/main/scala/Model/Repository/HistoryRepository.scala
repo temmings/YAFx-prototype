@@ -3,6 +3,7 @@ package Model.Repository
 import Configuration.Default
 import Model.Entity.{History, HistoryId}
 
+// TODO: ファイルに履歴を保存して再利用できるようにする
 class HistoryRepository extends Repository[History] {
   var histories: List[History] = Nil
   def resolve(id: HistoryId): Option[History] = {
