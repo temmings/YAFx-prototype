@@ -27,10 +27,8 @@ class ListController(
   private var showHiddenFiles: Boolean = false
   private val histories = new HistoryRepository
 
-  location.setMouseTransparent(true)
   location.onKeyPressed = onLocationKeyPressed
 
-  list.setMouseTransparent(true)
   list.cellFactory = (_: ListView[FormatItem]) => new ListCell[FormatItem](new ItemCell())
   list.onKeyPressed = onListKeyPressed
   list.onKeyReleased = onListKeyReleased

@@ -14,6 +14,14 @@
     -fx-font-family: monospace;
 }
 
+/* console */
+.yafx-console, .yafx-console .content {
+    -fx-min-height: 50;
+    -fx-background-color: black;
+    -fx-text-fill: #DDDDDD;
+    -fx-font-family: monospace;
+}
+
 /* image viewer */
 .yafx-image-container {
     -fx-background-color: black;

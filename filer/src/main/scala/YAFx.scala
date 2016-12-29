@@ -23,25 +23,29 @@ object YAFx extends JFXApp {
 
   val locationLeft = new TextField {
     editable = true
+    mouseTransparent = true
     styleClass += "yafx-location-bar"
   }
   val listLeft = new ListView[FormatItem] {
     editable = false
+    mouseTransparent = true
     vgrow = Priority.Always
     styleClass += "yafx-content-list"
   }
 
   val locationRight = new TextField {
     editable = true
+    mouseTransparent = true
     styleClass += "yafx-location-bar"
   }
   val listRight = new ListView[FormatItem] {
     editable = false
+    mouseTransparent = true
     vgrow = Priority.Always
     styleClass += "yafx-content-list"
   }
 
-  val listContainer = new HBox {
+  val listBox = new HBox {
     children = Seq(
       new VBox {
         children = Seq(locationLeft, listLeft)
@@ -53,9 +57,19 @@ object YAFx extends JFXApp {
       })
   }
 
-  val pane = new StackPane {
-    stylesheets = Seq("basic.css", "custom.css")
-    children = Seq(listContainer, viewer, imageContainer)
+  val mainPane = new StackPane {
+    children = Seq(listBox, viewer, imageContainer)
+  }
+
+  val console = new TextArea {
+    editable = false
+    wrapText = true
+    styleClass += "yafx-console"
+    mouseTransparent = true
+  }
+
+  val window = new VBox {
+    children = Seq(mainPane, console)
   }
 
   stage = new JFXApp.PrimaryStage() {
@@ -66,9 +80,12 @@ object YAFx extends JFXApp {
     maxWidth = Double.PositiveInfinity
     height = Default.WindowHeight
     width = Configuration.Default.WindowWidth
-    scene = new Scene(pane)
+    scene = new Scene(window) {
+      stylesheets = Seq("basic.css", "custom.css")
+    }
   }
 
+  val consoleController = new ConsoleController(console)
   val viewerController = new TextViewerController(viewer)
   val imageViewController = new ImageViewController(imageContainer)
   val fileListController = new ListController(locationLeft, listLeft, viewerController, imageViewController)
