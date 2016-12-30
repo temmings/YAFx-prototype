@@ -137,9 +137,9 @@ class ListController(
         (e.shiftDown, e.code) match {
           case (false, KeyCode.Tab) => pairFileList.focusToList()
           case (false, KeyCode.Enter) => getCurrentItem.foreach(actionOfContext)
-          case (false, KeyCode.BackSpace) => currentLocation.getParent.foreach(cd)
+          case (false, KeyCode.BackSpace) => currentLocation.parent.foreach(cd)
           case (false, KeyCode.Period) => toggleHiddenFiles()
-          case (false, KeyCode.BackSlash) => currentLocation.getRoot.foreach(cd)
+          case (false, KeyCode.BackSlash) => currentLocation.root.foreach(cd)
           case (false, KeyCode.C) => getCurrentItem.foreach {
             case x: FileItem => copyFile(x)
           }

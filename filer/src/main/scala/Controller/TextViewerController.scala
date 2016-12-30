@@ -35,7 +35,7 @@ class TextViewerController(viewer: TextArea) {
     viewer.setVisible(true)
     viewer.requestFocus
 
-    detect(item.getContents)
+    detect(item.content)
     println(s"isBinary: $isBinary, charset: $charset")
     isTextMode = !isBinary
     show()

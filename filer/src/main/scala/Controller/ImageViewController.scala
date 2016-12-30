@@ -19,7 +19,7 @@ class ImageViewController(container: Pane) {
     this.sourceControl = sourceControl
     container.setVisible(true)
     container.requestFocus
-    for (input <- managed(item.getContents.getInputStream)) {
+    for (input <- managed(item.content.getInputStream)) {
       val image = new Image(input)
       val imageView = new ImageView(image) {
         preserveRatio = true

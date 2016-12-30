@@ -24,13 +24,13 @@ case class FileItem(
 
   override def hasChildren: Boolean = isDirectory || isVirtualDirectory
 
-  override def getParent: Option[FileItem] = Option(file.getParent).map(x => this.copy(x))
+  override def parent: Option[FileItem] = Option(file.getParent).map(x => this.copy(x))
 
-  override def getRoot: Option[FileItem] = Option(file.getFileSystem.getRoot).map(x => this.copy(x))
+  override def root: Option[FileItem] = Option(file.getFileSystem.getRoot).map(x => this.copy(x))
 
   def getBaseName: String = file.getName.getBaseName
 
-  def getContents: FileContent = file.getContent
+  def content: FileContent = file.getContent
 
   def toFile: File = new File(file.getName.getPath)
 
