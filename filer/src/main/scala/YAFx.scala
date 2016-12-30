@@ -10,39 +10,39 @@ import scalafx.scene.layout._
 
 object YAFx extends JFXApp {
   val viewer = new TextArea {
+    id = "yafx-content-viewer"
     editable = false
     visible = false
     wrapText = true
-    styleClass += "yafx-content-viewer"
   }
 
   val imageContainer = new HBox {
+    id = "yafx-image-container"
     visible = false
-    styleClass += "yafx-image-container"
   }
 
   val locationLeft = new TextField {
+    id = "yafx-location-bar"
     editable = true
     mouseTransparent = true
-    styleClass += "yafx-location-bar"
   }
   val listLeft = new ListView[FormatItem] {
+    id = "yafx-content-list"
     editable = false
     mouseTransparent = true
     vgrow = Priority.Always
-    styleClass += "yafx-content-list"
   }
 
   val locationRight = new TextField {
+    id = "yafx-location-bar"
     editable = true
     mouseTransparent = true
-    styleClass += "yafx-location-bar"
   }
   val listRight = new ListView[FormatItem] {
+    id = "yafx-content-list"
     editable = false
     mouseTransparent = true
     vgrow = Priority.Always
-    styleClass += "yafx-content-list"
   }
 
   val listBox = new HBox {
@@ -62,9 +62,9 @@ object YAFx extends JFXApp {
   }
 
   val console = new TextArea {
+    id = "yafx-console"
     editable = false
     wrapText = true
-    styleClass += "yafx-console"
     mouseTransparent = true
   }
 
