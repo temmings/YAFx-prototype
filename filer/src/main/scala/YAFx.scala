@@ -68,11 +68,12 @@ object YAFx extends JFXApp {
     mouseTransparent = true
   }
 
-  val window = new VBox {
-    children = Seq(mainPane, console)
+  val window = new BorderPane {
+    center = mainPane
+    bottom = console
   }
 
-  stage = new JFXApp.PrimaryStage() {
+  stage = new JFXApp.PrimaryStage {
     title = "YAFx"
     minHeight = 200
     minWidth = 400
