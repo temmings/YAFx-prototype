@@ -6,14 +6,18 @@ import org.mozilla.universalchardet.UniversalDetector
 
 object Utils {
   def isBinary(in: InputStream): Boolean = {
-    // TODO: detect UTF-16
-    // TODO: detect BOM
     val size: Int = 1024
     val buf = new Array[Byte](size)
     val length = in.read(buf)
     val data = buf.take(length)
 
-    if (data.exists((0x00 to 0x08).contains(_))) return true
+    data.take(2) match {
+      case Array(-2, -1) | Array(-1, -2) =>
+        // UTF-16 is contains 0x00
+        if (data.exists((0x01 to 0x08).contains(_))) return true
+      case _ =>
+        if (data.exists((0x00 to 0x08).contains(_))) return true
+    }
     val asciiBytes = (0x09 to 0x0A) ++ (0x0C to 0x0D) ++ (0x20 to 0x7E)
     (100 * data.count(asciiBytes.contains)) / length <= 5
   }
