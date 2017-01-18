@@ -10,7 +10,8 @@ libraryDependencies ++= Seq(
   //"commons-io" % "commons-io" % "2.5"
   // https://mvnrepository.com/artifact/com.googlecode.juniversalchardet/juniversalchardet
   "com.googlecode.juniversalchardet" % "juniversalchardet" % "1.0.3",
-  "com.jsuereth" %% "scala-arm" % "2.0"
+  "com.jsuereth" %% "scala-arm" % "2.0",
+  "jp.gr.java_conf.dangan" % "jlha" % "0.06" from "http://dangan.g.dgdg.jp/Content/Program/Java/jLHA/jlha.jar"
 )
 
 enablePlugins(JavaAppPackaging)

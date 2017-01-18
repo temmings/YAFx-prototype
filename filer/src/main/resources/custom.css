@@ -33,7 +33,8 @@
 #yafx-content-list .yafx-item-ext-tar,
 #yafx-content-list .yafx-item-ext-tgz,
 #yafx-content-list .yafx-item-ext-tbz,
-#yafx-content-list .yafx-item-ext-zip {
+#yafx-content-list .yafx-item-ext-zip,
+#yafx-content-list .yafx-item-ext-lzh {
     -fx-text-fill: aqua;
 }
 

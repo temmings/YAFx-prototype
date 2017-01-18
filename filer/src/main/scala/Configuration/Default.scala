@@ -13,6 +13,6 @@ object Default {
   val WindowWidth = 1024.0
 
   val MaxDirHistories = 100
-  val SupportArchiveExtensions = List("gz", "bz2", "tar", "tgz", "tbz2", "zip", "jar")
+  val SupportArchiveExtensions = List("gz", "bz2", "tar", "tgz", "tbz2", "zip", "jar", "lzh")
   val SupportImageExtensions = List("bmp", "jpg", "jpeg", "png", "gif")
 }
