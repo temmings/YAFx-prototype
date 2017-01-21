@@ -37,4 +37,12 @@ case class FileItem(
   def toPath: Path = Paths.get(file.getName.getPath)
 
   def toURI: URI = new URI(file.getName.getURI)
+
+  override def equals(obj: scala.Any): Boolean = {
+    obj match {
+      case that: FileItem =>
+        that.canEqual(FileItem.this) && id == that.id && name == that.name
+      case _ => false
+    }
+  }
 }
