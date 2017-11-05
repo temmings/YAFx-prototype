@@ -3,6 +3,7 @@ import Controller._
 import Model.FormatItem
 
 import scalafx.application.{JFXApp, Platform}
+import scalafx.geometry.Insets
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
 import scalafx.scene.layout._
@@ -66,6 +67,7 @@ object YAFx extends JFXApp {
     editable = false
     wrapText = true
     mouseTransparent = true
+    margin = Insets(16, 0, 0, 0)
   }
 
   val window = new BorderPane {
