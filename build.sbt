@@ -9,7 +9,7 @@ lazy val commonSettings = Seq(
 lazy val filer = (project in file("filer"))
   .settings(commonSettings: _*)
   .settings(
-    name := "filer"
+    name := "yafx-filer"
   )
 
 lazy val root = (project in file("."))
