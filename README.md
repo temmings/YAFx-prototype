@@ -5,7 +5,7 @@ Yet another AFx
 
 ## demo movie
 
-<div align="center">
+<div>
   <a href="https://www.youtube.com/watch?v=JsQ_otb0N5A"><img width="560" height="315" src="https://img.youtube.com/vi/JsQ_otb0N5A/0.jpg" alt="YAFx-prototype demo img"></a>
 </div>
 
